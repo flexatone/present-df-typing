@@ -24,84 +24,41 @@ Type-Hinting Generic Arrays and Generic Variadic DataFrames
 
 Python type hints have made Python code more maintainable and statically verifiable. With generically typed containers (i.e, defining a `list` of `str` as `list[str]`), Python developers further benefit from type hints that precisely specify complex, nested data structures. DataFrames are also a complex, nested data structure: index labels, column labels, and columnar values all have distinct types. And yet, with many libraries (including Pandas), generic DataFrame specification is incomplete or not supported.
 
-Taking advantage of the new `TypeVarTuple` (introduced in Python 3.11), StaticFrame now supports complete generic specification of DataFrames. A DataFrame with date-index labels, string-column labels, and columnar types of integers and Booleans can now be type hinted as `sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.bool_]`. As `TypeVarTuple` defines variadic generics, the number of columnar types is flexible.
+Taking advantage of the new `TypeVarTuple` (introduced in Python 3.11) for type-hinting variable-sized columnar types, StaticFrame now supports complete generic specification of DataFrames. A DataFrame with date-index labels, string-column labels, and columnar types of integers and Booleans can now be type hinted as `sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.bool_]`. As `TypeVarTuple` defines variadic generics, the number of columnar types is flexible.
 
 Beyond defining individual column types, `TypeVarTuple` allows for specifying a type for a region of zero or more columns using star-expanded tuple generics. For example, a DataFrame with integer-index labels, string-column labels, and columnar types of one leading string column followed by zero or more float columns can be specified as `sf.Frame[sf.Index[np.int64], sf.Index[np.str_], np.str_, *tuple[np.float64, ...]]`. This permits flexible, expressive type hints.
 
-In this presentation I will introduce a comprehensive approach to type-hinting DataFrames and associated containers. The benefits of using `TypeVarTuple` for type-hinting columnar types as well as variable-depth hierarchical indices will be shown. StaticFrame goes further to implement run-time validation with the `CallGuard.check` decorator, as well as automatically deriving and testing type hints at run-time with the `TypeClinic` utility.
+In this presentation I will introduce a comprehensive toolkit for type-hinting DataFrames and associated containers. Beyond thorough generic specification, StaticFrame offers run-time validation with the `CallGuard.check` decorator, as well as run-time type-hint derivation and testing with the `TypeClinic` utility.
 
 
 
 // Provide an outline that lists the topics and activities you will use to guide the presentation. Please estimate what portion of your presentation you’ll devote to each major topic. We just want to see where the focus will be.
 
 
+
 I. Introduction (5 min)
-
-I.A. Type Hints
-    Benefits: maintainability and verifiability
-    Generic containers and nested data structures
-    Typing DataFrames in Pandas
-    Typing DataFrames with full generic specification
-
-I.B. The Problem of Typing DataFrames
-    Variable numbers of columns and columnar types
-    Complex hierarchical indices
-    How Pandas-style mutability makes static-typing hard
+I.A. Benefits of type hints
+I.B. How generics can define complex, nested data structures
+I.C. Type hinting with existing DataFrame libraries
+I.D. Type hinting DataFrames with full generic specification in StaticFrame
+I.E. The Problem of Typing DataFrames: variable numbers of columns and columnar types and the necessity of immutability
 
 II. `TypeVarTuple` in Action (10 min)
-
-II.A. How `TypeVarTuple` Works
-    Defines variadic generics
-    Class specification and mixture with `TypeVar`
-    The expressive opportunities of star-unpacking tuples
-    Using `typing-extensions` and `Unpack` for backwards compatibility
-
-II.B. Using `TypeVarTuple` for defining a generic `Frame` in StaticFrame
-    Defining a generic `Index`
-    Defining a generic `Frame` with `TypeVar`s for index and columns
-    Using `TypeVarTuple` for columnar types
-    The number of columns can define the type
-
-II.C. Is Shape a Type?
-    NumPy's generic `ndarray` permits specifying shape and type
-    As DataFrames have columnar types, typing columns is the priority
-    Length is a more often a run-time concern for DataFrames
-
-II.D. Using `TypeVarTuple` for defining hierarchical indices
-    Hierarchical indices can be thought of as an `Index` per depth level
-    Using `TypeVarTuple` for variable depths
-
+II.A. How `TypeVarTuple` Works: defining variadic generics and mixture with `TypeVar`
+II.B. Expressive Opportunities with Star-Unpacking Tuples
+II.C. Using `typing-extensions` and `Unpack` for backwards compatibility
+II.D. Using `TypeVarTuple` for defining a generic `Frame`
+II.E. Using `TypeVarTuple` for defining a generic `IndexHierarchy`
+II.F. Why DataFrames might not need shape types
 
 III. Benefits of Fully-Typed DataFrames (10 min)
-
 III.A. Using Pyright and Mypy for static analysis
-    Pyright offers full support
-    Mypy (as of 7.1) support is in development
-
 III.B. Using StaticFrame's `CallGuard.check` for run-time validation
-    Type-hints can lie
-    `CallGuard.check`: a decorator for run-time interface type validation
-    Specialized to fullly validated nested containers
-    Additional validators defined for usage in `Annotated` generics
-
 III.C. Using StaticFrame's `TypeClinic` for type discovery and run-time type checking
-    Given a complex DataFrame, determining the type-hint can be heard
-    `TypeClinic` can derive type hints from in-memory objects
-    `TypeClinic` can perform type-checks at run time
 
 IV. Conclusion (5 min)
-
 IV.A. An integrated, comprehensive type-hinting framework for DataFrames
-    Generic `Index` and `IndexHierarchy`
-    Generic `Series` and `Frame`
-    Runtime interface validation
-    Utilities for discovery and testing
-
 IV.B. Future work
-    Further integration of `TypeVars` in object methods
-    Using `overload` and axis-argument literals
-
-
 
 
 
