@@ -10,7 +10,7 @@ title: "Unlocking Complete DataFrame Type Hints with Python 3.11's `TypeVarTuple
 
 ---
 
-# Unlocking Complete DataFrame Type Hints with Python 3.11's `TypeVarTuple`
+# Improving Code Quality with Array and DataFrame Type Hints
 
 ### Christopher Ariza
 ### CTO, Research Affiliates
@@ -44,14 +44,20 @@ Creator of StaticFrame, an alternative DataFrame library
 
 ---
 
-# Type Hints Improve our Code
+# Type Hints Improve Code Quality
 
 <Transform :scale="1.5">
 <v-clicks>
 
-Increase maintainability
-
-Statically verifiable
+- Increase maintainability
+    - Code as documentation
+    - Avoid relying on variable name or comments
+- Statically verifiable type usage
+    - mypy, Pyright
+    - IDE integration / autocomplete
+- Run-time validation
+    - DRY: avoid redundant validations
+    - Prove hints are run-time correct
 
 </v-clicks>
 </Transform>
@@ -59,19 +65,152 @@ Statically verifiable
 
 ---
 
-# Generic Containers & Nested Data Structures
+# Type Hints Improve Code Quality: Examples
 
 <Transform :scale="1.5">
-<v-clicks depth="3">
 
-- Types can contain other types
-- Generic types permit nested specification
+```python
+
+def process(v, q): ...
+
+def process(v: int, q: bool) -> list[float]: ...
+
+def process(v, q):
+    assert isinstance(v, int)
+    assert isinstance(q, bool)
+
+    result = ...
+    assert isinstance(result, list)
+    assert all(isinstance(x, float) for x in result)
+    return result
+
+@sf.CallGuard.check
+def process(v: int, q: bool) -> list[float]: ...
+
+```
+</Transform>
+
+
+---
+
+# Type Hints with NumPy Arrays
+
+<Transform :scale="1.5">
+<v-clicks>
+
+- Collection types can contain other types
+- Generic typed collections permit nested specification
     - `list[str]`
     - `tuple[tuple[int, int], tuple[str, str]]`
-
+- `ndarray` supported Generic specification with NumPy 1.20
 
 </v-clicks>
 </Transform>
+
+
+---
+
+# Type Hints with NumPy Arrays: Examples
+
+<Transform :scale="1.5">
+
+```python
+
+def process(v, q): ...
+
+def process(
+        v: np.ndarray[tp.Any, np.dtype[np.int8]],
+        q: np.ndarray[tp.Any, np.dtype[np.bool_]],
+        ) -> np.ndarray[tp.Any, np.float64]: ...
+
+def process(v, q):
+    assert v.dtype == np.int64
+    assert q.dtype == np.bool_
+
+    result = ...
+    assert result.dtype == np.float64
+    return result
+
+@sf.CallGuard.check
+def process(
+        v: np.ndarray[tp.Any, np.dtype[np.int8]],
+        q: np.ndarray[tp.Any, np.dtype[np.bool_]],
+        ) -> np.ndarray[tp.Any, np.float64]: ...
+
+```
+</Transform>
+
+
+---
+
+# Type Hints with NumPy Arrays: Generic Arguments
+
+<Transform :scale="1.5">
+<v-clicks>
+
+- Generic `np.ndarray` take two arguments
+    - Shape
+    - `dytpe`
+- Shape is placeholder for a future shape definition
+    - Might use `tp.Literal[4]` for 1D specfication
+    - Might use `tuple[tp.Literal[4], tp.Literal[12]]` for 2D specfication
+    - Shape is often a run-time concern
+- `dtype` is generic, and requires a NumPy "generic" as an argument
+- `np.typing.NDArray[]` is a single-argument shortcut
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# Practical Type Hints with NumPy Arrays
+
+<Transform :scale="1.5">
+<v-clicks>
+
+- Ignore shape parameter for now
+- Create domain-specific type aliases of `np.ndarray` specifications
+    - `TNDArrayBool = np.ndarray[tp.Any, np.dtype[np.bool_]]`
+    - `TNDArrayFloat64 = np.ndarray[tp.Any, np.dtype[np.float64]]`
+- Use `sf.CallGuard.check` for run-time validation
+- Use `sf.Require.Shape()` for run-time shape validation
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# Practical Type Hints with NumPy Arrays: Examples
+
+<Transform :scale="1.5">
+
+```python
+
+TNDArrayBool = np.ndarray[tp.Any, np.dtype[np.bool_]]
+TNDArrayFloat64 = np.ndarray[tp.Any, np.dtype[np.float64]]
+TNDArrayInt8 = np.ndarray[tp.Any, np.dtype[np.float64]]
+
+@sf.CallGuard.check
+def process(
+        v: TNDArrayInt8,
+        q: TNDArrayBool,
+        ) -> TNDArrayFloat64: ...
+
+
+@sf.CallGuard.check
+def process(
+        v: tp.Annotate[TNDArrayInt8, sf.Require.Shape(24)],
+        q: tp.Annotate[TNDArrayBool, sf.Require.Shape(24)],
+        ) -> tp.Annotate[TNDArrayFloat64, sf.Require.Shape(24)]: ...
+
+```
+</Transform>
+
+
+
+
 
 
 ---
@@ -107,12 +246,6 @@ def process(f: pd.DataFrame) -> pd.Series: ...
 
 </Transform>
 
-
----
-layout: center
----
-
-# There has to be a better way!
 
 
 ---
@@ -168,29 +301,6 @@ def process(f: Frame[   # type of the container
 -->
 
 
----
-layout: center
----
-# `TypeVarTuple` in Action
-
-
----
-
-# How `TypeVarTuple` Works
-
-<Transform :scale="1.5">
-<v-clicks>
-
-Type variables permit specifying component types of a type
-
-Like `TypeVar`, `TypeVarTuple` is used in class definition
-
-Variadic generics permit a variable number of type vars
-
-One `TypeVarTuple` can be mixed with zero or more `TypeVar`
-
-</v-clicks>
-</Transform>
 
 
 
