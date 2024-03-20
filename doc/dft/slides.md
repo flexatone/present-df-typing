@@ -73,8 +73,10 @@ Creator of StaticFrame, an alternative DataFrame library
 
 def process(v, q): ...
 
+# adding type hints
 def process(v: int, q: bool) -> list[float]: ...
 
+# adding run-time type checks
 def process(v, q):
     assert isinstance(v, int)
     assert isinstance(q, bool)
@@ -84,6 +86,7 @@ def process(v, q):
     assert all(isinstance(x, float) for x in result)
     return result
 
+# runtime type checks with CallGuard
 @sf.CallGuard.check
 def process(v: int, q: bool) -> list[float]: ...
 
@@ -93,7 +96,7 @@ def process(v: int, q: bool) -> list[float]: ...
 
 ---
 
-# Type Hints with NumPy Arrays
+# Type Hinting Collections
 
 <Transform :scale="1.5">
 <v-clicks>
@@ -103,6 +106,30 @@ def process(v: int, q: bool) -> list[float]: ...
     - `list[str]`
     - `tuple[tuple[int, int], tuple[str, str]]`
 - `ndarray` supported Generic specification with NumPy 1.20
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# Type Hinting NumPy Arrays: Generic Arguments
+
+<Transform :scale="1.5">
+<v-clicks>
+
+- Generic `np.ndarray` take two arguments
+    - Shape
+    - `dytpe`
+- Shape is placeholder for a future shape definition
+    - Might use `tp.Literal[4]` for 1D specfication
+    - Might use `tuple[tp.Literal[4], tp.Literal[12]]` for 2D specfication
+    - Shape is often a run-time concern
+- `dtype` is itself generic
+    - A NumPy "generic" is the generic argument
+    - Might use `np.dytpe[np.integer]` for any integer type
+    - Might use `np.dtype[np.uint8]` for a narrow specified integer
+- `np.typing.NDArray[]` is a single-argument shortcut
 
 </v-clicks>
 </Transform>
@@ -140,26 +167,6 @@ def process(
 ```
 </Transform>
 
-
----
-
-# Type Hints with NumPy Arrays: Generic Arguments
-
-<Transform :scale="1.5">
-<v-clicks>
-
-- Generic `np.ndarray` take two arguments
-    - Shape
-    - `dytpe`
-- Shape is placeholder for a future shape definition
-    - Might use `tp.Literal[4]` for 1D specfication
-    - Might use `tuple[tp.Literal[4], tp.Literal[12]]` for 2D specfication
-    - Shape is often a run-time concern
-- `dtype` is generic, and requires a NumPy "generic" as an argument
-- `np.typing.NDArray[]` is a single-argument shortcut
-
-</v-clicks>
-</Transform>
 
 
 ---
