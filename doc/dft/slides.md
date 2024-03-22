@@ -339,19 +339,6 @@ def process(f: Frame[   # type of the container
 </v-clicks>
 </Transform>
 
-<!--
->>> df = pd.DataFrame([[True, 4], [False, 2]])
->>> df.dtypes.values.tolist()
-[dtype('bool'), dtype('int64')]
->>> df[2] = (1.2, 5.3)
->>> df.dtypes.values.tolist()
-[dtype('bool'), dtype('int64'), dtype('float64')]
->>> df.iloc[0, 0] = -1
->>> df.dtypes.values.tolist()
-[dtype('O'), dtype('int64'), dtype('float64')]
--->
-
-
 
 
 
