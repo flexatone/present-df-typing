@@ -1,0 +1,5 @@
+mypy==1.9.0
+pandas==2.2.1
+static-frame==2.5.0
+numpy==1.26.4
+pandas-stubs==2.2.1.240316

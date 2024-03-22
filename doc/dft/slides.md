@@ -217,19 +217,15 @@ def process(
 
 
 
-
-
-
 ---
 
-# DataFrames are Nested Data Structures
+# DataFrames are Collections of Nested Types
 
 <Transform :scale="1.5">
 <v-clicks depth="3">
 
 - Index and column labels have distinct types
 - Data values are typed by column
-- << diagram? >>
 - Interfaces rely on these types
     - Is the index a string or a date?
     - Are values all floats or integers
@@ -240,15 +236,63 @@ def process(
 
 ---
 
-# The Common Approach
+# Type Annotations with Pandas
 
 <Transform :scale="1.5">
-
 
 ```python
 import pandas as pd
 
 def process(f: pd.DataFrame) -> pd.Series: ...
+```
+
+</Transform>
+
+
+
+---
+
+# Third-Party Tools for Type Annotations with Pandas
+
+<Transform :scale="1.5">
+<v-clicks depth="3">
+
+- `pandas-stubs`
+    - Built from Microsoft and VirtusLabs
+    - Types Pandas interfaces
+    - Offers a generic `Series` but with an untyped index
+    - Does not offer a generic `Frame`
+- `nptyping`
+    - Offers alternative generic types
+    - Uses strings to document components
+        - `NDArray[Shape["2, 2"], Int]`
+        - `DataFrame[S["name: Str, x: Float, y: Float"]]`
+- Pandera
+    - Offers alternative generic types
+    - DataFrames must be defined with a Schema class
+
+</v-clicks>
+</Transform>
+
+
+
+---
+
+# Statically Typing Mutable Collections is Messy
+
+
+<Transform :scale="1.5">
+
+```python
+import pandas as pd
+
+>>> s: "Series[np.int64]" = pd.Series([10, 20, 30])
+>>> s[2] = 30.5
+>>> s.dtype
+dtype('float64')
+>>> s[1] = False
+>>> s.dtype
+dtype('O')
 ```
 
 </Transform>
