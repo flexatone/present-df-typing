@@ -15,4 +15,7 @@ y: tp.Sequence[int] = process(v=5, q=False)
 
 
 z = process(v=6, q='foo')
-print(z)
+
+# static_frame.core.type_clinic.ClinicError:
+# In args of (v: int, q: bool) -> list[float]
+# └── Expected bool, provided int invalid
