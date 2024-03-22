@@ -244,7 +244,6 @@ def process1(
     r = np.where(q, 0.5, 1)
     s = np.where(q, 1, 0.25)
     return tp.cast(TNDArrayFloat64, v * r * s)
-
 ```
 </Transform>
 
@@ -256,22 +255,19 @@ def process1(
 <Transform :scale="1.25">
 
 ```python
-TNDArrayBool = np.ndarray[tp.Any, np.dtype[np.bool_]]
-TNDArrayInt8 = np.ndarray[tp.Any, np.dtype[np.int8]]
-TNDArrayInt64 = np.ndarray[tp.Any, np.dtype[np.int64]]
-TNDArrayFloat64 = np.ndarray[tp.Any, np.dtype[np.float64]]
-
 def process1(v: TNDArrayInt8, q: TNDArrayBool) -> TNDArrayFloat64: ...
 
 v1: TNDArrayInt8 = np.arange(20, dtype=np.int8)
 x = process1(v1, v1)
 # tp_np.py: error: Argument 2 to "process1" has incompatible type "ndarray[Any, dtype[floating[_64Bit]]]"; expected "ndarray[Any, dtype[bool_]]"  [arg-type]
 
-v2: TNDArrayInt64 = np.arange(20, dtype=np.int64)
+v2: np.ndarray[tp.Any, np.dtype[np.int64]] = np.arange(20, dtype=np.int64)
 q: TNDArrayBool = np.arange(20) % 3 == 0
 x = process1(v2, q)
 # tp_np.py: error: Argument 1 to "process1" has incompatible type "ndarray[Any, dtype[signedinteger[_64Bit]]]"; expected "ndarray[Any, dtype[signedinteger[_8Bit]]]"  [arg-type]
 
+y: TNDArrayBool = process1(v1, q)
+# tp_np.py: error: Incompatible types in assignment (expression has type "ndarray[Any, dtype[floating[_64Bit]]]", variable has type "ndarray[Any, dtype[bool_]]")  [assignment]
 ```
 </Transform>
 
@@ -279,35 +275,67 @@ x = process1(v2, q)
 
 ---
 
-# Practical Type Hints with NumPy Arrays: Examples
+# Type Hints with NumPy Arrays: Static Analysis
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 
 ```python
+TNDArrayIntAny = np.ndarray[tp.Any, np.dtype[np.signedinteger[tp.Any]]]
 
-TNDArrayBool = np.ndarray[tp.Any, np.dtype[np.bool_]]
-TNDArrayInt8 = np.ndarray[tp.Any, np.dtype[np.float64]]
-TNDArrayFloat64 = np.ndarray[tp.Any, np.dtype[np.float64]]
-
-@sf.CallGuard.check
-def process(
-        v: TNDArrayInt8,
+def process2(
+        v: TNDArrayIntAny,
         q: TNDArrayBool,
-        ) -> TNDArrayFloat64: ...
+        ) -> TNDArrayFloat64:
+    r = np.where(q, 0.5, 1)
+    s = np.where(q, 1, 0.25)
+    return tp.cast(TNDArrayFloat64, v * r * s)
 
-
-@sf.CallGuard.check
-def process(
-        v: tp.Annotate[TNDArrayInt8, sf.Require.Shape(24)],
-        q: tp.Annotate[TNDArrayBool, sf.Require.Shape(24)],
-        ) -> tp.Annotate[TNDArrayFloat64, sf.Require.Shape(24)]: ...
-
+x = process2(v1, q)
+x = process2(v2, q)
 ```
 </Transform>
 
 
 
+---
 
+# Type Hints with NumPy Arrays: Run-Time Validation
+
+<Transform :scale="1.25">
+
+```python
+@sf.CallGuard.check
+def process3(
+        v: TNDArrayInt8,
+        q: TNDArrayBool,
+        ) -> TNDArrayFloat64:
+    r = np.where(q, 0.5, 1)
+    s = np.where(q, 1, 0.25)
+    return tp.cast(TNDArrayFloat64, v * r * s)
+
+x = process3(v1, q)
+x = process3(v2, q)
+# static_frame.core.type_clinic.ClinicError:
+# In args of (v: ndarray[Any, dtype[int8]], q: ndarray[Any, dtype[bool_]]) -> ndarray[Any, dtype[float64]]
+# └── ndarray[Any, dtype[int8]]
+#     └── dtype[int8]
+#         └── Expected int8, provided int64 invalid
+```
+</Transform>
+
+
+---
+
+# Extending Run-Time Validation with `sf.Requirre`
+
+<Transform :scale="1.5">
+<v-clicks>
+
+- Shape and other characteristics can be validated at run time.
+- `sf.Require` provides a family of validators
+
+</v-clicks>
+</Transform>
 
 
 

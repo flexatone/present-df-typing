@@ -41,8 +41,38 @@ def process2(
 x = process2(v1, q)
 x = process2(v2, q)
 
-
-
 y: TNDArrayBool = process2(v1, q)
 # tp_np.py:51: error: Incompatible types in assignment (expression has type "ndarray[Any, dtype[floating[_64Bit]]]", variable has type "ndarray[Any, dtype[bool_]]")  [assignment]
 
+@sf.CallGuard.check
+def process3(
+        v: TNDArrayInt8,
+        q: TNDArrayBool,
+        ) -> TNDArrayFloat64:
+    r = np.where(q, 0.5, 1)
+    s = np.where(q, 1, 0.25)
+    return tp.cast(TNDArrayFloat64, v * r * s)
+
+x = process3(v1, q)
+x = process3(v2, q)
+# static_frame.core.type_clinic.ClinicError:
+# In args of (v: ndarray[Any, dtype[int8]], q: ndarray[Any, dtype[bool_]]) -> ndarray[Any, dtype[float64]]
+# └── ndarray[Any, dtype[int8]]
+#     └── dtype[int8]
+#         └── Expected int8, provided int64 invalid
+
+
+
+
+# @sf.CallGuard.check
+# def process(
+#         v: TNDArrayInt8,
+#         q: TNDArrayBool,
+#         ) -> TNDArrayFloat64: ...
+
+
+# @sf.CallGuard.check
+# def process(
+#         v: tp.Annotate[TNDArrayInt8, sf.Require.Shape(24)],
+#         q: tp.Annotate[TNDArrayBool, sf.Require.Shape(24)],
+#         ) -> tp.Annotate[TNDArrayFloat64, sf.Require.Shape(24)]: ...
