@@ -212,33 +212,6 @@ z = process(v=6, q='foo')
 
 ---
 
-# Type Hinting NumPy Arrays: Generic Arguments
-
-<Transform :scale="1.5">
-<v-clicks>
-
-- Generic `np.ndarray` take two arguments
-    - Shape
-    - `dytpe`
-    - `np.ndarray[tp.Any, np.dtype[np.float64]]`
-- Shape is placeholder for a future shape definition
-    - Might use `tp.Literal[4]` for 1D specfication
-    - Might use `tuple[tp.Literal[4], tp.Literal[12]]` for 2D specification
-    - No standard yet set
-    - Shape is often a run-time concern
-- `dtype` is itself generic
-    - A NumPy "generic" is the generic argument
-    - Might use `np.dytpe[np.integer]` for any integer type
-    - Might use `np.dtype[np.uint8]` for a narrow specified integer
-- `np.typing.NDArray[]` is a single-argument shortcut
-
-</v-clicks>
-</Transform>
-
-
-
----
-
 # Type Hints with NumPy Arrays: Examples
 
 <Transform :scale="1.5">
