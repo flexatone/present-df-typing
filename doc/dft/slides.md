@@ -6,7 +6,7 @@ lineNumbers: false
 transition: slide-left
 aspectRatio: 16/9
 favicon: /favicon.ico
-title: "Unlocking Complete DataFrame Type Hints with Python 3.11's `TypeVarTuple`"
+title: "Improving Code Quality with Array and DataFrame Type Hints"
 
 ---
 
@@ -46,18 +46,18 @@ Creator of StaticFrame, an alternative DataFrame library
 
 # Type Hints Improve Code Quality
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 <v-clicks>
 
 - Increase maintainability
     - Code as documentation
     - Avoid relying on variable name or comments
 - Statically verifiable type usage
-    - mypy, Pyright
+    - mypy (1.9), Pyright
     - IDE integration / autocomplete
 - Run-time validation
     - DRY: avoid redundant validations
-    - Prove hints are run-time correct
+    - Prove hints are correct
 
 </v-clicks>
 </Transform>
@@ -65,9 +65,9 @@ Creator of StaticFrame, an alternative DataFrame library
 
 ---
 
-# Type Hints Improve Code Quality: Examples
+# Type Hints Improve Code Quality: Static Analysis
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 
 ```python
 
@@ -76,19 +76,79 @@ def process(v, q): ...
 # adding type hints
 def process(v: int, q: bool) -> list[float]: ...
 
+x = process(v=5, q=20)
+# tp_basic.py: error: Argument "q" to "process"
+# has incompatible type "int"; expected "bool"  [arg-type]
+
+y: tp.Sequence[int] = process(v=5, q=False)
+# tp_basic.py: error: Incompatible types in assignment
+# (expression has type "list[float]", variable has type
+# "Sequence[int]")  [assignment]
+
+
+```
+</Transform>
+
+
+---
+
+# Type Hints Improve Code Quality: Run-Time Validation
+
+<Transform :scale="1.25">
+
+```python
+
 # adding run-time type checks
 def process(v, q):
     assert isinstance(v, int)
     assert isinstance(q, bool)
-
-    result = ...
+    result = [x * (0.5 if q else 0.25) for x in range(v)]
     assert isinstance(result, list)
     assert all(isinstance(x, float) for x in result)
     return result
+```
+</Transform>
+
+
+---
+
+# Runtime Validation with `CallGuard`
+
+<Transform :scale="1.25">
+<v-clicks>
+
+- Use type annotations for run-time checks
+- General-purpose tools
+    - `typeguard`
+    - `beartype`
+- `CallGuard`
+    - Specialized for NumPy and StaticFrame containers
+    - Handles standard Python type and collections
+    - Deployed as a decorator
+        - `sf.CallGuard.check`: raise `ClinicError` on failure
+        - `sf.CallGuard.warn`: issue a warning on failure
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# Type Hints Improve Code Quality: Run-Time Validation
+
+<Transform :scale="1.25">
+
+```python
 
 # runtime type checks with CallGuard
 @sf.CallGuard.check
-def process(v: int, q: bool) -> list[float]: ...
+def process(v: int, q: bool) -> list[float]:
+    return [x * (0.5 if q else 0.25) for x in range(v)]
+
+z = process(v=6, q='foo')
+# static_frame.core.type_clinic.ClinicError:
+# In args of (v: int, q: bool) -> list[float]
+# └── Expected bool, provided int invalid
 
 ```
 </Transform>
@@ -103,9 +163,48 @@ def process(v: int, q: bool) -> list[float]: ...
 
 - Collection types can contain other types
 - Generic typed collections permit nested specification
-    - `list[str]`
+    - `list[float]`
     - `tuple[tuple[int, int], tuple[str, str]]`
+- Generic arguments are positional only
 - `ndarray` supported Generic specification with NumPy 1.20
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# Type Hinting NumPy Arrays: Generic Arguments
+
+<Transform :scale="1.25">
+<v-clicks>
+
+- Generic `np.ndarray` take two arguments
+    - Shape
+    - `dytpe`
+    - `np.ndarray[tp.Any, np.dtype[np.float64]]`
+- `np.typing.NDArray[]`
+    - A single-argument shortcut
+    - Only requires dtype
+
+</v-clicks>
+</Transform>
+
+---
+
+# Type Hinting NumPy Arrays: Generic Arguments
+
+<Transform :scale="1.25">
+<v-clicks>
+
+- Shape is placeholder for a future shape definition
+    - Might use `tp.Literal[4]` for 1D specfication
+    - Might use `tuple[tp.Literal[4], tp.Literal[12]]` for 2D specification
+    - Shape is often a run-time concern
+- `dtype` is itself generic
+    - A NumPy "generic" is the generic argument
+    - Might use `np.dytpe[np.integer]` for any integer type
+    - Might use `np.dtype[np.uint8]` for a narrow specified integer
 
 </v-clicks>
 </Transform>
@@ -121,9 +220,11 @@ def process(v: int, q: bool) -> list[float]: ...
 - Generic `np.ndarray` take two arguments
     - Shape
     - `dytpe`
+    - `np.ndarray[tp.Any, np.dtype[np.float64]]`
 - Shape is placeholder for a future shape definition
     - Might use `tp.Literal[4]` for 1D specfication
-    - Might use `tuple[tp.Literal[4], tp.Literal[12]]` for 2D specfication
+    - Might use `tuple[tp.Literal[4], tp.Literal[12]]` for 2D specification
+    - No standard yet set
     - Shape is often a run-time concern
 - `dtype` is itself generic
     - A NumPy "generic" is the generic argument
@@ -133,6 +234,7 @@ def process(v: int, q: bool) -> list[float]: ...
 
 </v-clicks>
 </Transform>
+
 
 
 ---
@@ -228,10 +330,30 @@ def process(
 - Data values are typed by column
 - Interfaces rely on these types
     - Is the index a string or a date?
-    - Are values all floats or integers
+    - Are values all floats or integers?
 
 </v-clicks>
 </Transform>
+
+
+---
+
+# The Challenge of Typing DataFrames
+
+<Transform :scale="1.5">
+<v-clicks>
+
+- A DataFrame has a variable number of columns (and thus types)
+- Requires a variadic generic: `TypeVarTuple`
+- Hierarchical indices also require variadic types
+- In-place mutation (as in Pandas) negates static typing
+    - Adding columns adds types
+    - In-place mutation can change a columnar type
+- Static typing benefits from immutability
+
+</v-clicks>
+</Transform>
+
 
 
 ---
@@ -268,8 +390,9 @@ def process(f: pd.DataFrame) -> pd.Series: ...
         - `NDArray[Shape["2, 2"], Int]`
         - `DataFrame[S["name: Str, x: Float, y: Float"]]`
 - Pandera
-    - Offers alternative generic types
+    - Offers alternative subclasses that are generic
     - DataFrames must be defined with a Schema class
+    - Assumes immutability
 
 </v-clicks>
 </Transform>
@@ -320,24 +443,6 @@ def process(f: Frame[   # type of the container
 
 </Transform>
 
-
----
-
-# The Problem of Typing DataFrames
-
-<Transform :scale="1.5">
-<v-clicks>
-
-- A DataFrame has a variable number of columns (and thus types)
-- Requires a variadic generic: `TypeVarTuple`
-- Hierarchical indices also require variadic types
-- In-place mutation (as in Pandas) negates static typing
-    - Adding columns adds types
-    - In-place mutation can change a columnar type
-- Static typing benefits from immutability
-
-</v-clicks>
-</Transform>
 
 
 
