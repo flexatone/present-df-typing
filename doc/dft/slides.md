@@ -212,54 +212,69 @@ z = process(v=6, q='foo')
 
 ---
 
-# Type Hints with NumPy Arrays: Examples
+# Type Hinting NumPy Arrays: Practical Approaches
 
 <Transform :scale="1.5">
+<v-clicks>
+
+- Ignore shape parameter with `tp.Any`
+- Create type aliases of `np.ndarray` generics
+    - `TNDArrayBool = np.ndarray[tp.Any, np.dtype[np.bool_]]`
+    - `TNDArrayFloat64 = np.ndarray[tp.Any, np.dtype[np.float64]]`
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# Type Hints with NumPy Arrays: Static Analysis
+
+<Transform :scale="1.25">
 
 ```python
+TNDArrayBool = np.ndarray[tp.Any, np.dtype[np.bool_]]
+TNDArrayInt8 = np.ndarray[tp.Any, np.dtype[np.int8]]
+TNDArrayFloat64 = np.ndarray[tp.Any, np.dtype[np.float64]]
 
-def process(v, q): ...
-
-def process(
-        v: np.ndarray[tp.Any, np.dtype[np.int8]],
-        q: np.ndarray[tp.Any, np.dtype[np.bool_]],
-        ) -> np.ndarray[tp.Any, np.float64]: ...
-
-def process(v, q):
-    assert v.dtype == np.int64
-    assert q.dtype == np.bool_
-
-    result = ...
-    assert result.dtype == np.float64
-    return result
-
-@sf.CallGuard.check
-def process(
-        v: np.ndarray[tp.Any, np.dtype[np.int8]],
-        q: np.ndarray[tp.Any, np.dtype[np.bool_]],
-        ) -> np.ndarray[tp.Any, np.float64]: ...
+def process1(
+        v: TNDArrayInt8,
+        q: TNDArrayBool,
+        ) -> TNDArrayFloat64:
+    r = np.where(q, 0.5, 1)
+    s = np.where(q, 1, 0.25)
+    return tp.cast(TNDArrayFloat64, v * r * s)
 
 ```
 </Transform>
 
 
-
 ---
 
-# Practical Type Hints with NumPy Arrays
+# Type Hints with NumPy Arrays: Static Analysis
 
-<Transform :scale="1.5">
-<v-clicks>
+<Transform :scale="1.25">
 
-- Ignore shape parameter for now
-- Create domain-specific type aliases of `np.ndarray` specifications
-    - `TNDArrayBool = np.ndarray[tp.Any, np.dtype[np.bool_]]`
-    - `TNDArrayFloat64 = np.ndarray[tp.Any, np.dtype[np.float64]]`
-- Use `sf.CallGuard.check` for run-time validation
-- Use `sf.Require.Shape()` for run-time shape validation
+```python
+TNDArrayBool = np.ndarray[tp.Any, np.dtype[np.bool_]]
+TNDArrayInt8 = np.ndarray[tp.Any, np.dtype[np.int8]]
+TNDArrayInt64 = np.ndarray[tp.Any, np.dtype[np.int64]]
+TNDArrayFloat64 = np.ndarray[tp.Any, np.dtype[np.float64]]
 
-</v-clicks>
+def process1(v: TNDArrayInt8, q: TNDArrayBool) -> TNDArrayFloat64: ...
+
+v1: TNDArrayInt8 = np.arange(20, dtype=np.int8)
+x = process1(v1, v1)
+# tp_np.py: error: Argument 2 to "process1" has incompatible type "ndarray[Any, dtype[floating[_64Bit]]]"; expected "ndarray[Any, dtype[bool_]]"  [arg-type]
+
+v2: TNDArrayInt64 = np.arange(20, dtype=np.int64)
+q: TNDArrayBool = np.arange(20) % 3 == 0
+x = process1(v2, q)
+# tp_np.py: error: Argument 1 to "process1" has incompatible type "ndarray[Any, dtype[signedinteger[_64Bit]]]"; expected "ndarray[Any, dtype[signedinteger[_8Bit]]]"  [arg-type]
+
+```
 </Transform>
+
 
 
 ---
@@ -271,8 +286,8 @@ def process(
 ```python
 
 TNDArrayBool = np.ndarray[tp.Any, np.dtype[np.bool_]]
-TNDArrayFloat64 = np.ndarray[tp.Any, np.dtype[np.float64]]
 TNDArrayInt8 = np.ndarray[tp.Any, np.dtype[np.float64]]
+TNDArrayFloat64 = np.ndarray[tp.Any, np.dtype[np.float64]]
 
 @sf.CallGuard.check
 def process(
@@ -289,6 +304,10 @@ def process(
 
 ```
 </Transform>
+
+
+
+
 
 
 

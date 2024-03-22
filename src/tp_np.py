@@ -11,12 +11,9 @@ def process1(
         v: TNDArrayInt8,
         q: TNDArrayBool,
         ) -> TNDArrayFloat64:
-    r = np.full(v.shape, 0.5)
-    r[~q] = 1
-    s = np.full(v.shape, 0.25)
-    s[q] = 1
+    r = np.where(q, 0.5, 1)
+    s = np.where(q, 1, 0.25)
     return tp.cast(TNDArrayFloat64, v * r * s)
-
 
 
 v1: TNDArrayInt8 = np.arange(20, dtype=np.int8)
@@ -37,10 +34,8 @@ def process2(
         v: TNDArrayIntAny,
         q: TNDArrayBool,
         ) -> TNDArrayFloat64:
-    r = np.full(v.shape, 0.5)
-    r[~q] = 1
-    s = np.full(v.shape, 0.25)
-    s[q] = 1
+    r = np.where(q, 0.5, 1)
+    s = np.where(q, 1, 0.25)
     return tp.cast(TNDArrayFloat64, v * r * s)
 
 x = process2(v1, q)
@@ -50,3 +45,4 @@ x = process2(v2, q)
 
 y: TNDArrayBool = process2(v1, q)
 # tp_np.py:51: error: Incompatible types in assignment (expression has type "ndarray[Any, dtype[floating[_64Bit]]]", variable has type "ndarray[Any, dtype[bool_]]")  [assignment]
+
