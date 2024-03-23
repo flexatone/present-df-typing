@@ -221,6 +221,7 @@ z = process(v=6, q='foo')
 - Create type aliases of `np.ndarray` generics
     - `TNDArrayBool = np.ndarray[tp.Any, np.dtype[np.bool_]]`
     - `TNDArrayFloat64 = np.ndarray[tp.Any, np.dtype[np.float64]]`
+    - `TNDArrayIntAny = np.ndarray[tp.Any, np.dtype[np.signedinteger[tp.Any]]]`
 
 </v-clicks>
 </Transform>
@@ -228,7 +229,7 @@ z = process(v=6, q='foo')
 
 ---
 
-# Type Hints with NumPy Arrays: Static Analysis
+# Typing NumPy Arrays: Static Analysis
 
 <Transform :scale="1.25">
 
@@ -250,7 +251,7 @@ def process1(
 
 ---
 
-# Type Hints with NumPy Arrays: Static Analysis
+# Typing NumPy Arrays: Static Analysis
 
 <Transform :scale="1.25">
 
@@ -275,7 +276,7 @@ y: TNDArrayBool = process1(v1, q)
 
 ---
 
-# Type Hints with NumPy Arrays: Static Analysis
+# Typing NumPy Arrays: Static Analysis
 
 <Transform :scale="1.25">
 
@@ -299,7 +300,7 @@ x = process2(v2, q)
 
 ---
 
-# Type Hints with NumPy Arrays: Run-Time Validation
+# Typing NumPy Arrays: Run-Time Validation
 
 <Transform :scale="1.25">
 
@@ -326,16 +327,46 @@ x = process3(v2, q)
 
 ---
 
-# Extending Run-Time Validation with `sf.Requirre`
+# Extending Run-Time Validation with `sf.Require`
 
 <Transform :scale="1.5">
 <v-clicks>
 
 - Shape and other characteristics can be validated at run time.
 - `sf.Require` provides a family of validators
-
+    - `sf.Require.Len`
+    - `sf.Require.Shape`
+    - `sf.Require.Apply`
+    - `sf.Require.Name`
+    - `sf.Require.LabelsMatch`
+    - `sf.Require.LabelsOrder`
+- Deployed within `tp.Annotate`
+    - `TNDArrayInt8` -> `tp.Annotate[TNDArrayInt8, sf.Require.Len(24)]`
+    - `TNDArrayFloat64` -> `tp.Annotate[TNDArrayInt8, sf.Require.Shape(..., 4)]`
 </v-clicks>
 </Transform>
+
+
+---
+
+# Typing NumPy Arrays: Run-Time Validation with `sf.Require`
+
+<Transform :scale="1.25">
+
+```python
+@sf.CallGuard.check
+def process4(
+        v: tp.Annotate[TNDArrayInt8, sf.Require.Shape(24)],
+        q: tp.Annotate[TNDArrayBool, sf.Require.Shape(24)],
+        ) -> tp.Annotate[TNDArrayFloat64, sf.Require.Shape(24)]:
+    r = np.where(q, 0.5, 1)
+    s = np.where(q, 1, 0.25)
+    return tp.cast(TNDArrayFloat64, v * r * s)
+
+# x = process3(v1, q)
+# x = process3(v2, q)
+</Transform>
+
 
 
 
