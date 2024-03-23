@@ -68,7 +68,7 @@ x = process3(v2, q)
 def process4(
         v: tp.Annotate[TNDArrayInt8, sf.Require.Shape(24)],
         q: tp.Annotate[TNDArrayBool, sf.Require.Shape(24)],
-        ) -> tp.Annotate[TNDArrayFloat64, sf.Require.Shape(24)]: ...
+        ) -> tp.Annotate[TNDArrayFloat64, sf.Require.Shape(24)]:
     r = np.where(q, 0.5, 1)
     s = np.where(q, 1, 0.25)
     return tp.cast(TNDArrayFloat64, v * r * s)
