@@ -63,6 +63,41 @@ Creator of StaticFrame, an alternative DataFrame library
 </Transform>
 
 
+---
+
+# Type Hints: Not a Free Lunch
+
+<Transform :scale="1.25">
+<v-clicks>
+
+- Incorrect or invalid type hints are common
+    - `from __future__ import annotations` means hints are not evaluated
+    - IDE will use what it can without complaint
+    - A potential source of technical debt
+- Use `mypy` or `Pyright` to at least evaluate that hints valid
+
+</v-clicks>
+</Transform>
+
+---
+
+# Typing Facilities on the Bleeding Edge
+
+<Transform :scale="1.25">
+<v-clicks>
+
+- Many of critical typing utilities are only in modern Python
+- Use `typing-extensions>=4.10.0` for back back-ports
+- Use latest `mypy` or `Pyright` versions
+- Use recent packages
+    - `static-frame>=2.5.1`
+    - `numpy>=1.23.5`
+
+</v-clicks>
+</Transform>
+
+
+
 
 ---
 layout: center
