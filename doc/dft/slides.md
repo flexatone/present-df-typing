@@ -63,9 +63,17 @@ Creator of StaticFrame, an alternative DataFrame library
 </Transform>
 
 
+
+---
+layout: center
+---
+# Simple Type hints
+
+
+
 ---
 
-# Type Hints Improve Code Quality: Static Analysis
+# I: Static Analysis of Type Hints
 
 <Transform :scale="1.25">
 
@@ -84,20 +92,18 @@ y: tp.Sequence[int] = process(v=5, q=False)
 # tp_basic.py: error: Incompatible types in assignment
 # (expression has type "list[float]", variable has type
 # "Sequence[int]")  [assignment]
-
-
 ```
+
 </Transform>
 
 
 ---
 
-# Type Hints Improve Code Quality: Run-Time Validation
+# I: Runtime Validation
 
 <Transform :scale="1.25">
 
 ```python
-
 # adding run-time type checks
 def process(v, q):
     assert isinstance(v, int)
@@ -111,8 +117,8 @@ def process(v, q):
 
 
 ---
-
-# Runtime Validation with `CallGuard`
+---
+# I: Runtime Validation with `CallGuard`
 
 <Transform :scale="1.25">
 <v-clicks>
@@ -123,7 +129,7 @@ def process(v, q):
     - `beartype`
 - `CallGuard`
     - Specialized for NumPy and StaticFrame containers
-    - Handles standard Python type and collections
+    - Handles standard Python types and collections
     - Deployed as a decorator
         - `sf.CallGuard.check`: raise `ClinicError` on failure
         - `sf.CallGuard.warn`: issue a warning on failure
@@ -133,8 +139,8 @@ def process(v, q):
 
 
 ---
-
-# Type Hints Improve Code Quality: Run-Time Validation
+---
+# I: Runtime Validation
 
 <Transform :scale="1.25">
 
@@ -154,9 +160,18 @@ z = process(v=6, q='foo')
 </Transform>
 
 
+
+
+---
+layout: center
+---
+# Type-hinting generic arrays
+
+
+
 ---
 
-# Type Hinting Collections
+# II: Type Hinting Collections
 
 <Transform :scale="1.5">
 <v-clicks>
@@ -174,7 +189,7 @@ z = process(v=6, q='foo')
 
 ---
 
-# Type Hinting NumPy Arrays: Generic Arguments
+# II: Type Hinting NumPy Arrays: Generic Arguments
 
 <Transform :scale="1.25">
 <v-clicks>
@@ -192,7 +207,7 @@ z = process(v=6, q='foo')
 
 ---
 
-# Type Hinting NumPy Arrays: Generic Arguments
+# II: Type Hinting NumPy Arrays: Generic Arguments
 
 <Transform :scale="1.25">
 <v-clicks>
@@ -212,7 +227,7 @@ z = process(v=6, q='foo')
 
 ---
 
-# Type Hinting NumPy Arrays: Practical Approaches
+# II: Type Hinting NumPy Arrays: Practical Approaches
 
 <Transform :scale="1.5">
 <v-clicks>
@@ -229,7 +244,7 @@ z = process(v=6, q='foo')
 
 ---
 
-# Typing NumPy Arrays: Static Analysis
+# II: Typing NumPy Arrays: Static Analysis
 
 <Transform :scale="1.25">
 
@@ -251,7 +266,7 @@ def process1(
 
 ---
 
-# Typing NumPy Arrays: Static Analysis
+# II: Typing NumPy Arrays: Static Analysis
 
 <Transform :scale="1.25">
 
@@ -273,16 +288,14 @@ y: TNDArrayBool = process1(v1, q)
 </Transform>
 
 
-
 ---
 
-# Typing NumPy Arrays: Static Analysis
+# II: Typing NumPy Arrays: Static Analysis
 
 <Transform :scale="1.25">
 
 ```python
 TNDArrayIntAny = np.ndarray[tp.Any, np.dtype[np.signedinteger[tp.Any]]]
-
 def process2(
         v: TNDArrayIntAny,
         q: TNDArrayBool,
@@ -293,21 +306,25 @@ def process2(
 
 x = process2(v1, q)
 x = process2(v2, q)
+v3: TNDArrayFloat64 = np.arange(20, dtype=np.float64) * 0.5
+x = process2(v3, q)
+# tp_np.py: error: Argument 1 to "process2" has incompatible type
+# "ndarray[Any, dtype[floating[_64Bit]]]";
+# expected "ndarray[Any, dtype[signedinteger[Any]]]"  [arg-type]
 ```
 </Transform>
 
 
-
 ---
 
-# Typing NumPy Arrays: Run-Time Validation
+# II: Typing NumPy Arrays: Runtime Validation
 
 <Transform :scale="1.25">
 
 ```python
 @sf.CallGuard.check
 def process3(
-        v: TNDArrayInt8,
+        v: TNDArrayIntAny,
         q: TNDArrayBool,
         ) -> TNDArrayFloat64:
     r = np.where(q, 0.5, 1)
@@ -316,20 +333,22 @@ def process3(
 
 x = process3(v1, q)
 x = process3(v2, q)
+v3: TNDArrayFloat64 = np.arange(20, dtype=np.float64) * 0.5
+x = process3(v3, q)
 # static_frame.core.type_clinic.ClinicError:
-# In args of (v: ndarray[Any, dtype[int8]], q: ndarray[Any, dtype[bool_]]) -> ndarray[Any, dtype[float64]]
-# └── ndarray[Any, dtype[int8]]
-#     └── dtype[int8]
-#         └── Expected int8, provided int64 invalid
+# In args of (v: ndarray[Any, dtype[signedinteger[Any]]], q: ndarray[Any, dtype[bool_]]) -> ndarray[Any, dtype[float64]]
+# └── ndarray[Any, dtype[signedinteger[Any]]]
+#     └── dtype[signedinteger[Any]]
+#         └── Expected signedinteger, provided float64 invalid
 ```
 </Transform>
 
 
 ---
 
-# Extending Run-Time Validation with `sf.Require`
+# II: Extending Runtime Validation: `sf.Require`
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 <v-clicks>
 
 - Shape and other characteristics can be validated at run time.
@@ -340,45 +359,70 @@ x = process3(v2, q)
     - `sf.Require.Name`
     - `sf.Require.LabelsMatch`
     - `sf.Require.LabelsOrder`
-- Deployed within `tp.Annotate`
-    - `TNDArrayInt8` -> `tp.Annotate[TNDArrayInt8, sf.Require.Len(24)]`
-    - `TNDArrayFloat64` -> `tp.Annotate[TNDArrayInt8, sf.Require.Shape(..., 4)]`
 </v-clicks>
 </Transform>
 
 
 ---
 
-# Typing NumPy Arrays: Run-Time Validation with `sf.Require`
+# II: Extending Runtime Validation: `tp.Annotated`
+
+<Transform :scale="1.25">
+<v-clicks>
+
+- `tp.Annotated` permits arbitrary objects to be bundled with type annotations
+- `sf.Require` Deployed within `tp.Annotated`
+    - `TNDArrayInt8` -> `tp.Annotated[TNDArrayInt8, sf.Require.Len(24)]`
+    - `TNDArrayFloat64` -> `tp.Annotated[TNDArrayInt8, sf.Require.Shape(..., 4)]`
+</v-clicks>
+</Transform>
+
+
+---
+
+# II: Runtime Validation with `sf.Require`
 
 <Transform :scale="1.25">
 
 ```python
 @sf.CallGuard.check
 def process4(
-        v: tp.Annotate[TNDArrayInt8, sf.Require.Shape(24)],
-        q: tp.Annotate[TNDArrayBool, sf.Require.Shape(24)],
-        ) -> tp.Annotate[TNDArrayFloat64, sf.Require.Shape(24)]:
+        v: tp.Annotated[TNDArrayInt8, sf.Require.Shape(24)],
+        q: tp.Annotated[TNDArrayBool, sf.Require.Shape(24)],
+        ) -> tp.Annotated[TNDArrayFloat64, sf.Require.Shape(24)]:
     r = np.where(q, 0.5, 1)
     s = np.where(q, 1, 0.25)
     return tp.cast(TNDArrayFloat64, v * r * s)
 
-# x = process3(v1, q)
-# x = process3(v2, q)
+x = process4(v1, q)
+# static_frame.core.type_clinic.ClinicError:
+# In args of (v: Annotated[ndarray[Any, dtype[int8]], Shape((24,))], q: Annotated[ndarray[Any, dtype[bool_]], Shape((24,))]) -> Annotated[ndarray[Any, dtype[float64]], Shape((24,))]
+# └── Annotated[ndarray[Any, dtype[int8]], Shape((24,))]
+#     └── Shape((24,))
+#         └── Expected shape ((24,)), provided shape (20,)
+```
 </Transform>
 
 
 
 
+
+---
+layout: center
+---
+# Type hinting DataFrames
+
+
+
 ---
 
-# DataFrames are Collections of Nested Types
+# III: DataFrames are Collections of Nested Types
 
 <Transform :scale="1.5">
 <v-clicks depth="3">
 
-- Index and column labels have distinct types
 - Data values are typed by column
+- Index and column labels have distinct types
 - Interfaces rely on these types
     - Is the index a string or a date?
     - Are values all floats or integers?
@@ -389,7 +433,7 @@ def process4(
 
 ---
 
-# The Challenge of Typing DataFrames
+# III: The Challenge of Typing DataFrames
 
 <Transform :scale="1.5">
 <v-clicks>
@@ -409,7 +453,7 @@ def process4(
 
 ---
 
-# Type Annotations with Pandas
+# III: Type Annotations with Pandas
 
 <Transform :scale="1.5">
 
@@ -425,14 +469,13 @@ def process(f: pd.DataFrame) -> pd.Series: ...
 
 ---
 
-# Third-Party Tools for Type Annotations with Pandas
+# III: Third-Party Tools for Typing Pandas
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 <v-clicks depth="3">
 
 - `pandas-stubs`
     - Built from Microsoft and VirtusLabs
-    - Types Pandas interfaces
     - Offers a generic `Series` but with an untyped index
     - Does not offer a generic `Frame`
 - `nptyping`
@@ -440,19 +483,31 @@ def process(f: pd.DataFrame) -> pd.Series: ...
     - Uses strings to document components
         - `NDArray[Shape["2, 2"], Int]`
         - `DataFrame[S["name: Str, x: Float, y: Float"]]`
-- Pandera
-    - Offers alternative subclasses that are generic
-    - DataFrames must be defined with a Schema class
-    - Assumes immutability
 
 </v-clicks>
 </Transform>
 
 
+---
+
+# III: Third-Party Tools for Typing Pandas
+
+<Transform :scale="1.5">
+<v-clicks depth="3">
+
+- Pandera
+    - Offers alternative subclasses that are generic
+    - DataFrames must be defined with a Schema class
+    - Assumes immutability
+- Even if third-party tools exist, is it sensible?
+
+</v-clicks>
+</Transform>
+
 
 ---
 
-# Statically Typing Mutable Collections is Messy
+# III: Statically Typing Mutable Collections is Messy
 
 
 <Transform :scale="1.5">
@@ -475,7 +530,7 @@ dtype('O')
 
 ---
 
-# Full Generic DataFrame Specification in StaticFrame
+# III: Full Generic DataFrame Specification in StaticFrame
 
 <Transform :scale="1.5">
 
@@ -501,11 +556,12 @@ def process(f: Frame[   # type of the container
 
 
 ---
----
+
 # Thank You
 
 <Transform :scale="1.5">
 
-
 StaticFrame: https://static-frame.dev
 </Transform>
+
+
