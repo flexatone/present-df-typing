@@ -11,9 +11,8 @@ def process1(
         v: TNDArrayInt8,
         q: TNDArrayBool,
         ) -> TNDArrayFloat64:
-    r = np.where(q, 0.5, 1)
-    s = np.where(q, 1, 0.25)
-    return tp.cast(TNDArrayFloat64, v * r * s)
+    s = np.where(q, 0.5, 0.25)
+    return tp.cast(TNDArrayFloat64, v * s)
 
 
 v1: TNDArrayInt8 = np.arange(20, dtype=np.int8)
@@ -37,9 +36,8 @@ def process2(
         v: TNDArrayIntAny,
         q: TNDArrayBool,
         ) -> TNDArrayFloat64:
-    r = np.where(q, 0.5, 1)
-    s = np.where(q, 1, 0.25)
-    return tp.cast(TNDArrayFloat64, v * r * s)
+    s = np.where(q, 0.5, 0.25)
+    return tp.cast(TNDArrayFloat64, v * s)
 
 x = process2(v1, q)
 x = process2(v2, q)
@@ -52,9 +50,8 @@ def process3(
         v: TNDArrayIntAny,
         q: TNDArrayBool,
         ) -> TNDArrayFloat64:
-    r = np.where(q, 0.5, 1)
-    s = np.where(q, 1, 0.25)
-    return tp.cast(TNDArrayFloat64, v * r * s)
+    s = np.where(q, 0.5, 0.25)
+    return tp.cast(TNDArrayFloat64, v * s)
 
 x = process3(v1, q)
 x = process3(v2, q)
@@ -73,9 +70,8 @@ def process4(
         v: tp.Annotated[TNDArrayInt8, sf.Require.Shape(24)],
         q: tp.Annotated[TNDArrayBool, sf.Require.Shape(24)],
         ) -> tp.Annotated[TNDArrayFloat64, sf.Require.Shape(24)]:
-    r = np.where(q, 0.5, 1)
-    s = np.where(q, 1, 0.25)
-    return tp.cast(TNDArrayFloat64, v * r * s)
+    s = np.where(q, 0.5, 0.25)
+    return tp.cast(TNDArrayFloat64, v * s)
 
 x = process4(v1, q)
 # static_frame.core.type_clinic.ClinicError:

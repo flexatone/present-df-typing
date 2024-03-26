@@ -292,9 +292,8 @@ def process1(
         v: TNDArrayInt8,
         q: TNDArrayBool,
         ) -> TNDArrayFloat64:
-    r = np.where(q, 0.5, 1)
-    s = np.where(q, 1, 0.25)
-    return tp.cast(TNDArrayFloat64, v * r * s)
+    s = np.where(q, 0.5, 0.25)
+    return tp.cast(TNDArrayFloat64, v * s)
 ```
 </Transform>
 
@@ -335,9 +334,8 @@ def process2(
         v: TNDArrayIntAny,
         q: TNDArrayBool,
         ) -> TNDArrayFloat64:
-    r = np.where(q, 0.5, 1)
-    s = np.where(q, 1, 0.25)
-    return tp.cast(TNDArrayFloat64, v * r * s)
+    s = np.where(q, 0.5, 0.25)
+    return tp.cast(TNDArrayFloat64, v * s)
 
 x = process2(v1, q)
 x = process2(v2, q)
@@ -362,9 +360,8 @@ def process3(
         v: TNDArrayIntAny,
         q: TNDArrayBool,
         ) -> TNDArrayFloat64:
-    r = np.where(q, 0.5, 1)
-    s = np.where(q, 1, 0.25)
-    return tp.cast(TNDArrayFloat64, v * r * s)
+    s = np.where(q, 0.5, 0.25)
+    return tp.cast(TNDArrayFloat64, v * s)
 
 x = process3(v1, q)
 x = process3(v2, q)
@@ -425,9 +422,8 @@ def process4(
         v: tp.Annotated[TNDArrayInt8, sf.Require.Shape(24)],
         q: tp.Annotated[TNDArrayBool, sf.Require.Shape(24)],
         ) -> tp.Annotated[TNDArrayFloat64, sf.Require.Shape(24)]:
-    r = np.where(q, 0.5, 1)
-    s = np.where(q, 1, 0.25)
-    return tp.cast(TNDArrayFloat64, v * r * s)
+    s = np.where(q, 0.5, 0.25)
+    return tp.cast(TNDArrayFloat64, v * s)
 
 x = process4(v1, q)
 # static_frame.core.type_clinic.ClinicError:
@@ -474,12 +470,9 @@ layout: center
 <v-clicks>
 
 - A DataFrame has a variable number of columns (and thus types)
-- Requires a variadic generic: `TypeVarTuple`
-- Hierarchical indices also require variadic types
-- In-place mutation (as in Pandas) negates static typing
-    - Adding columns adds types
-    - In-place mutation can change a columnar type
-- Static typing benefits from immutability
+    - Requires a variadic generic: `TypeVarTuple`
+    - Hierarchical indices also require variadic types
+- Statically typing mutable collection is messy
 
 </v-clicks>
 </Transform>
@@ -495,7 +488,7 @@ layout: center
 ```python
 import pandas as pd
 
-def process(f: pd.DataFrame) -> pd.Series: ...
+def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 ```
 
 </Transform>
@@ -509,13 +502,14 @@ def process(f: pd.DataFrame) -> pd.Series: ...
 <Transform :scale="1.25">
 <v-clicks depth="3">
 
+- Pandas does not support generic specification of containers
 - `pandas-stubs`
     - Built from Microsoft and VirtusLabs
     - Offers a generic `Series` but with an untyped index
     - Does not offer a generic `Frame`
 - `nptyping`
     - Offers alternative generic types
-    - Uses strings to document components
+    - Uses strings to define components
         - `NDArray[Shape["2, 2"], Int]`
         - `DataFrame[S["name: Str, x: Float, y: Float"]]`
 
@@ -550,7 +544,7 @@ def process(f: pd.DataFrame) -> pd.Series: ...
 ```python
 import pandas as pd
 
->>> s: "Series[np.int64]" = pd.Series([10, 20, 30])
+>>> s: Series[np.int64] = pd.Series([10, 20, 30])
 >>> s[2] = 30.5
 >>> s.dtype
 dtype('float64')
@@ -562,27 +556,52 @@ dtype('O')
 </Transform>
 
 
-
 ---
 
-# III: Full Generic DataFrame Specification in StaticFrame
+# III: Shallow DataFrame Typing
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 
 ```python
-from typing import Any
-from static_frame import Frame, Index, TSeriesAny
+import pandas as pd
 
-def process(f: Frame[   # type of the container
-        Any,            # type of the index labels
-        Index[np.str_], # type of the column labels
-        np.int_,        # type of the first column
-        np.str_,        # type of the second column
-        np.float64,     # type of the third column
-        ]) -> TSeriesAny: ...
+def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 ```
 
 </Transform>
+
+
+---
+
+# III: Deep DataFrame Typing
+
+<Transform :scale="1.25">
+
+```python
+def process(
+    v: sf.Frame[
+        sf.IndexDate,      # type of Frame index labels
+        sf.Index[np.str_], # type of Frame column labels
+        np.int64,          # type of Frame first column
+        np.int64,          # type of Frame second column
+        ],
+    q: sf.Series[
+        sf.IndexYearMonth, # type of Series index labels
+        np.bool_,          # type of Index values
+        ],
+    ) -> Series[
+        sf.IndexDate,      # type of Series index labels
+        np.float64,        # type of Series values
+        ]: ...
+```
+</Transform>
+
+
+
+---
+layout: center
+---
+# But this is too complex!
 
 
 
