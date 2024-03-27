@@ -3,11 +3,11 @@ import static_frame as sf
 import numpy as np
 import typing as tp
 
-TFrameDateInts = sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.int64]
+TFrameDateIntInt = sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.int64]
 TSeriesYMBool = sf.Series[sf.IndexYearMonth, np.bool_]
 TSeriesDFloat = sf.Series[sf.IndexDate, np.float64]
 
-def process(v: TFrameDateInts, q: TSeriesYMBool) -> TSeriesDFloat:
+def process(v: TFrameDateIntInt, q: TSeriesYMBool) -> TSeriesDFloat:
     t = v.index.iter_label().apply(lambda l: q[l.astype('datetime64[M]')]) # type: ignore
     s = np.where(t, 0.5, 0.25)
     return tp.cast(TSeriesDFloat, (v.via_T * s).mean(axis=1))
@@ -21,7 +21,7 @@ v1: TFrameDateIntFloat = sf.Frame.from_fields([range(5), np.arange(3, 8) * 0.5],
 x = process(v1, q)
 # tpst_frame.py: error: Argument 1 to "process" has incompatible type "Frame[IndexDate, Index[str_], signedinteger[_64Bit], floating[_64Bit]]"; expected "Frame[IndexDate, Index[str_], signedinteger[_64Bit], signedinteger[_64Bit]]"  [arg-type]
 
-v2: TFrameDateInts = sf.Frame.from_fields([range(5), range(3, 8)], columns=('a', 'b'), index=sf.IndexDate.from_date_range('2021-12-30', '2022-01-03'))
+v2: TFrameDateIntInt = sf.Frame.from_fields([range(5), range(3, 8)], columns=('a', 'b'), index=sf.IndexDate.from_date_range('2021-12-30', '2022-01-03'))
 x = process(v2, q)
 
 
