@@ -108,12 +108,11 @@ layout: center
 
 ---
 
-# I: Static Analysis of Type Hints
+# I: Static Analysis of Type Hints: `mypy`
 
 <Transform :scale="1.25">
 
-```python
-
+```python {all|1|3-4|6-8|10-13}
 def process(v, q): ...
 
 # adding type hints
@@ -138,7 +137,7 @@ y: tp.Sequence[int] = process(v=5, q=False)
 
 <Transform :scale="1.25">
 
-```python
+```python {all|1-2|1-4|5|6-8}
 # adding run-time type checks
 def process(v, q):
     assert isinstance(v, int)
@@ -153,7 +152,7 @@ def process(v, q):
 
 ---
 ---
-# I: Runtime Validation with `CallGuard`
+# I: Runtime Validation: Validators
 
 <Transform :scale="1.25">
 <v-clicks>
@@ -162,16 +161,26 @@ def process(v, q):
 - General-purpose tools
     - `typeguard`
     - `beartype`
-- `CallGuard`
-    - Specialized for NumPy and StaticFrame containers
-    - Handles standard Python types and collections
-    - Deployed as a decorator
-        - `sf.CallGuard.check`: raise `ClinicError` on failure
-        - `sf.CallGuard.warn`: issue a warning on failure
-
 </v-clicks>
 </Transform>
 
+
+---
+---
+# I: Runtime Validation: `CallGuard`
+
+<Transform :scale="1.25">
+<v-clicks>
+
+- Class within StaticFrame
+- Specialized for NumPy and StaticFrame containers
+- Handles standard Python types and collections
+- Deployed as a decorator
+    - `sf.CallGuard.check`: raise `ClinicError` on failure
+    - `sf.CallGuard.warn`: issue a warning on failure
+
+</v-clicks>
+</Transform>
 
 ---
 ---
@@ -179,8 +188,7 @@ def process(v, q):
 
 <Transform :scale="1.25">
 
-```python
-
+```python {all|1-2|1-4|5-9}
 # runtime type checks with CallGuard
 @sf.CallGuard.check
 def process(v: int, q: bool) -> list[float]:
@@ -232,10 +240,7 @@ layout: center
 - Generic `np.ndarray` take two arguments
     - Shape
     - `dytpe`
-    - `np.ndarray[tp.Any, np.dtype[np.float64]]`
-- `np.typing.NDArray[]`
-    - A single-argument shortcut
-    - Only requires dtype
+- `np.ndarray[tp.Any, np.dtype[np.float64]]`
 
 </v-clicks>
 </Transform>
@@ -245,7 +250,7 @@ layout: center
 # II: Type Hinting NumPy Arrays: Generic Arguments
 
 <Transform :scale="1.25">
-<v-clicks>
+<v-clicks depth="2">
 
 - Shape is placeholder for a future shape definition
     - Might use `tp.Literal[4]` for 1D specfication
@@ -265,7 +270,7 @@ layout: center
 # II: Type Hinting NumPy Arrays: Practical Approaches
 
 <Transform :scale="1.5">
-<v-clicks>
+<v-clicks depth="2">
 
 - Ignore shape parameter with `tp.Any`
 - Create type aliases of `np.ndarray` generics
@@ -283,7 +288,7 @@ layout: center
 
 <Transform :scale="1.25">
 
-```python
+```python {all|1-3|5|5-6|5-7|5-8|5-9|5-10}
 TNDArrayBool = np.ndarray[tp.Any, np.dtype[np.bool_]]
 TNDArrayInt8 = np.ndarray[tp.Any, np.dtype[np.int8]]
 TNDArrayFloat64 = np.ndarray[tp.Any, np.dtype[np.float64]]
@@ -304,22 +309,44 @@ def process1(
 
 <Transform :scale="1.25">
 
-```python
-def process1(v: TNDArrayInt8, q: TNDArrayBool) -> TNDArrayFloat64: ...
-
+```python {all|1-4|6-10|12-}
 v1: TNDArrayInt8 = np.arange(20, dtype=np.int8)
 x = process1(v1, v1)
-# tp_np.py: error: Argument 2 to "process1" has incompatible type "ndarray[Any, dtype[floating[_64Bit]]]"; expected "ndarray[Any, dtype[bool_]]"  [arg-type]
+# tp_np.py: error: Argument 2 to "process1" has incompatible type
+# "ndarray[Any, dtype[floating[_64Bit]]]"; expected "ndarray[Any, dtype[bool_]]"  [arg-type]
 
 v2: np.ndarray[tp.Any, np.dtype[np.int64]] = np.arange(20, dtype=np.int64)
 q: TNDArrayBool = np.arange(20) % 3 == 0
 x = process1(v2, q)
-# tp_np.py: error: Argument 1 to "process1" has incompatible type "ndarray[Any, dtype[signedinteger[_64Bit]]]"; expected "ndarray[Any, dtype[signedinteger[_8Bit]]]"  [arg-type]
+# tp_np.py: error: Argument 1 to "process1" has incompatible type
+# "ndarray[Any, dtype[signedinteger[_64Bit]]]"; expected "ndarray[Any, dtype[signedinteger[_8Bit]]]"  [arg-type]
 
 y: TNDArrayBool = process1(v1, q)
-# tp_np.py: error: Incompatible types in assignment (expression has type "ndarray[Any, dtype[floating[_64Bit]]]", variable has type "ndarray[Any, dtype[bool_]]")  [assignment]
+# tp_np.py: error: Incompatible types in assignment (expression has type
+# "ndarray[Any, dtype[floating[_64Bit]]]", variable has type "ndarray[Any, dtype[bool_]]")  [assignment]
 ```
 </Transform>
+
+---
+
+# II: More with NumPy `generic`
+
+<Transform :scale="1.25">
+<v-clicks depth="2">
+
+- Can specify integers independent of size
+    - `np.signedinteger[tp.Any]`
+    - `np.unsignedinteger[tp.Any]`
+    - `np.integer[tp.Any]`
+- Can specify inexact independent of size
+    - `np.floating[tp.Any]`
+    - `np.complexfloating[tp.Any, tp.Any]`
+    - `np.inexact[tp.Any]`
+- Any type of number: `np.number[tp.Any]`
+
+</v-clicks>
+</Transform>
+
 
 
 ---
@@ -328,7 +355,7 @@ y: TNDArrayBool = process1(v1, q)
 
 <Transform :scale="1.25">
 
-```python
+```python {all|1|2-7|6-10|11|11-}
 TNDArrayIntAny = np.ndarray[tp.Any, np.dtype[np.signedinteger[tp.Any]]]
 def process2(
         v: TNDArrayIntAny,
@@ -354,12 +381,9 @@ x = process2(v3, q)
 
 <Transform :scale="1.25">
 
-```python
+```python {all|1|1-4|6-7|8|8-}
 @sf.CallGuard.check
-def process3(
-        v: TNDArrayIntAny,
-        q: TNDArrayBool,
-        ) -> TNDArrayFloat64:
+def process3(v: TNDArrayIntAny, q: TNDArrayBool) -> TNDArrayFloat64:
     s = np.where(q, 0.5, 0.25)
     return tp.cast(TNDArrayFloat64, v * s)
 
@@ -381,7 +405,7 @@ x = process3(v3, q)
 # II: Extending Runtime Validation: `sf.Require`
 
 <Transform :scale="1.25">
-<v-clicks>
+<v-clicks depth="2">
 
 - Shape and other characteristics can be validated at run time.
 - `sf.Require` provides a family of validators
@@ -400,7 +424,7 @@ x = process3(v3, q)
 # II: Extending Runtime Validation: `tp.Annotated`
 
 <Transform :scale="1.25">
-<v-clicks>
+<v-clicks depth="2">
 
 - `tp.Annotated` permits arbitrary objects to be bundled with type annotations
 - `sf.Require` Deployed within `tp.Annotated`
@@ -416,7 +440,7 @@ x = process3(v3, q)
 
 <Transform :scale="1.25">
 
-```python
+```python {all|1|1-5|1-7|9-}
 @sf.CallGuard.check
 def process4(
         v: tp.Annotated[TNDArrayInt8, sf.Require.Shape(24)],
@@ -444,13 +468,12 @@ layout: center
 # Type hinting DataFrames
 
 
-
 ---
 
 # III: DataFrames are Collections of Nested Types
 
 <Transform :scale="1.5">
-<v-clicks depth="3">
+<v-clicks depth="2">
 
 - Data values are typed by column
 - Index and column labels have distinct types
@@ -467,7 +490,7 @@ layout: center
 # III: The Challenge of Typing DataFrames
 
 <Transform :scale="1.5">
-<v-clicks>
+<v-clicks depth="2">
 
 - A DataFrame has a variable number of columns (and thus types)
     - Requires a variadic generic: `TypeVarTuple`
@@ -483,7 +506,7 @@ layout: center
 
 # III: Type Annotations with Pandas
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 
 ```python
 import pandas as pd
@@ -541,9 +564,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 
 <Transform :scale="1.5">
 
-```python
-import pandas as pd
-
+```python {all|1|2|3-4|5|6-}
 >>> s: Series[np.int64] = pd.Series([10, 20, 30])
 >>> s[2] = 30.5
 >>> s.dtype
@@ -577,7 +598,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 
 <Transform :scale="1.25">
 
-```python
+```python {all|1|2-2|2-3|2-4|2-5|2-7|8|8-9|8-11|12|12-13|12-14|all}
 def process(
     v: sf.Frame[
         sf.IndexDate,      # type of Frame index labels
@@ -604,8 +625,63 @@ layout: center
 # But this is too complex!
 
 
+---
+
+# III: Static Analysis of Typed DataFrames
+
+<Transform :scale="1.25">
+
+```python
+TFrameDateInts = sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.int64]
+TSeriesYMBool = sf.Series[sf.IndexYearMonth, np.bool_]
+TSeriesDFloat = sf.Series[sf.IndexDate, np.float64]
+
+def process(v: TFrameDateInts, q: TSeriesYMBool) -> TSeriesDFloat:
+    t = v.index.iter_label().apply(lambda l: q[l.astype('datetime64[M]')]) # type: ignore
+    s = np.where(t, 0.5, 0.25)
+    return tp.cast(TSeriesDFloat, (v.via_T * s).mean(axis=1))
+```
+</Transform>
 
 
+---
+
+# III: Static Analysis of Typed DataFrames: `mypy`
+
+<Transform :scale="1.25">
+
+```python
+q: TSeriesYMBool = sf.Series([True, False], index=sf.IndexYearMonth.from_date_range('2021-12', '2022-01'))
+x = process(q, q)
+# tpst_frame.py: error: Argument 1 to "process" has incompatible type
+# "Series[IndexYearMonth, bool_]"; expected
+# "Frame[IndexDate, Index[str_], signedinteger[_64Bit], signedinteger[_64Bit]]"  [arg-type]
+```
+</Transform>
+
+
+---
+
+# III: Static Analysis of Typed DataFrames: `mypy`
+
+<Transform :scale="1.25">
+
+```python
+TFrameDateIntFloat = sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.float64]
+v1: TFrameDateIntFloat = sf.Frame.from_fields([range(5), np.arange(3, 8) * 0.5],
+columns=('a', 'b'), index=sf.IndexDate.from_date_range('2021-12-30', '2022-01-03'))
+
+x = process(v1, q)
+# tpst_frame.py: error: Argument 1 to "process" has incompatible type
+# "Frame[IndexDate, Index[str_], signedinteger[_64Bit], floating[_64Bit]]"; expected
+# "Frame[IndexDate, Index[str_], signedinteger[_64Bit], signedinteger[_64Bit]]"  [arg-type]
+
+v2: TFrameDateInts = sf.Frame.from_fields([range(5), range(3, 8)],
+columns=('a', 'b'), index=sf.IndexDate.from_date_range('2021-12-30', '2022-01-03'))
+
+x = process(v2, q)
+```
+</Transform>
 
 
 
