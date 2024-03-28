@@ -44,19 +44,66 @@ Creator of StaticFrame, an alternative DataFrame library
 
 ---
 
+# Insufficient Type Depth
+
+<Transform :scale="1.25">
+
+```python
+import pandas as pd
+
+def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
+```
+
+</Transform>
+
+
+---
+
+# Complete Type Information
+
+<Transform :scale="1.25">
+
+```python {all}
+def process(
+    v: sf.Frame[
+        sf.IndexDate,      # type of Frame index labels
+        sf.Index[np.str_], # type of Frame column labels
+        np.int64,          # type of Frame first column
+        np.int64,          # type of Frame second column
+        ],
+    q: sf.Series[
+        sf.IndexYearMonth, # type of Series index labels
+        np.bool_,          # type of Series values
+        ],
+    ) -> Series[
+        sf.IndexDate,      # type of Series in0dex labels
+        np.float64,        # type of Series values
+        ]: ...
+```
+</Transform>
+
+
+---
+layout: center
+---
+# Why do we need type annotations?
+
+
+---
+
 # Type Hints Improve Code Quality
 
 <Transform :scale="1.25">
-<v-clicks depth="2">
+<v-clicks depth="1">
 
 - Increase maintainability
     - Code as documentation
     - Avoid relying just on names or comments
-- Statically verifiable type usage
-    - `mypy`, Pyright
+- Support static analysis
+    - Type validation with `mypy`, `pyright`
     - IDE integration, autocomplete, AI assistants
-- Run-time validation of type
-    - Avoid redundant definitions
+- Runtime type validation
+    - Reuse type hints at runtime
     - Prove hints are correct
 
 </v-clicks>
@@ -68,13 +115,13 @@ Creator of StaticFrame, an alternative DataFrame library
 # Type Hints Are Not a Free Lunch
 
 <Transform :scale="1.25">
-<v-clicks depth="2">
+<v-clicks depth="1">
 
 - Incorrect or invalid type hints are common
     - `from __future__ import annotations` means hints are not evaluated
-    - IDE will use what it can without complaint
+    - IDE will use what it can
     - A source of technical debt
-- Use `mypy` or `Pyright` to at least evaluate that hints are valid
+- Use `mypy` or `pyright` to at least evaluate that hints are valid
     - `mypy` offers configuration to incrementally increase strictness
     - `mypy --strict` is used here
 
@@ -90,8 +137,8 @@ Creator of StaticFrame, an alternative DataFrame library
 
 - Many important typing utilities are only available in recent Python
 - Use `typing-extensions>=4.10.0` for back-ports
-- Must use latest `mypy` or `Pyright` versions
-- Use recent packages
+- Must use latest releases
+    - `mypy==1.9.0` (released March 2024)
     - `static-frame>=2.5.1`
     - `numpy>=1.23.5`
 
@@ -153,7 +200,7 @@ y: tp.Sequence[int] = process(v=5, q=False)
 <Transform :scale="1.25">
 
 ```python {all|1-2|1-4|5|6-8}
-# adding run-time type checks
+# adding runtime type checks
 def process(v, q):
     assert isinstance(v, int)
     assert isinstance(q, bool)
@@ -172,7 +219,7 @@ def process(v, q):
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-- Reuse type annotations for run-time type checks
+- Reuse type annotations for runtime type checks
     - `typeguard`
     - `beartype`
     - `sf.CallGuard`
@@ -233,7 +280,7 @@ layout: center
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-- Generic collection are defined with component types
+- Generic collections are defined with component types
 - Generic collections permit nested specification
     - `list[float]`
     - `tuple[tuple[int, int], tuple[str, str]]`
@@ -267,14 +314,15 @@ layout: center
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-- Shape is placeholder for a future shape definition
+- Shape
+    - A placeholder for a future shape definition
     - Might use `tp.Literal[4]` for 1D specfication
     - Might use `tuple[tp.Literal[4], tp.Literal[12]]` for 2D specification
-    - Shape is often a run-time concern
-- `dtype` is itself generic
-    - A NumPy "generic" is the argument
-    - Might use `np.dytpe[np.integer[tp.Any]]` for any integer type
+    - Shape is often a runtime concern
+- `dtype`
+    - A generic that takes a NumPy "generic" as the argument
     - Might use `np.dtype[np.uint8]` for a narrowly specified integer
+    - Might use `np.dytpe[np.integer[tp.Any]]` for any integer type
 
 </v-clicks>
 </Transform>
@@ -366,7 +414,7 @@ y: TNDArrayBool = process1(v1, q)
 
 ---
 
-# II: Typed Array Static Analysis
+# II: Typed Array Static Analysis: `mypy`
 
 <Transform :scale="1.25">
 
@@ -379,8 +427,8 @@ def process2(
     s = np.where(q, 0.5, 0.25)
     return tp.cast(TNDArrayFloat64, v * s)
 
-x = process2(v1, q)
-x = process2(v2, q)
+x = process2(v1, q) # no mypy error
+x = process2(v2, q) # no mypy error
 v3: TNDArrayFloat64 = np.arange(20, dtype=np.float64) * 0.5
 x = process2(v3, q)
 # tp_np.py: error: Argument 1 to "process2" has incompatible type
@@ -392,7 +440,7 @@ x = process2(v3, q)
 
 ---
 
-# II: Typed Array Runtime Validation
+# II: Typed Array Runtime Validation: `CallGuard`
 
 <Transform :scale="1.25">
 
@@ -430,6 +478,7 @@ x = process3(v3, q) # error, same as mypy
     - `sf.Require.Name`
     - `sf.Require.LabelsMatch`
     - `sf.Require.LabelsOrder`
+- Using `sf.Require` requires using `tp.Annotated`
 </v-clicks>
 </Transform>
 
@@ -441,7 +490,7 @@ x = process3(v3, q) # error, same as mypy
 <v-clicks depth="2">
 
 - `tp.Annotated` permits arbitrary objects to be bundled with type annotations
-- `sf.Require` is deployed within `tp.Annotated`
+- Specify `sf.Require` instances within `tp.Annotated`
     - `TNDArrayIntAny` -> `tp.Annotated[TNDArrayIntAny, sf.Require.Len(24)]`
     - `TNDArrayFloat64` -> `tp.Annotated[TNDArrayFloat64, sf.Require.Shape(..., 4), sf.Require.Apply(lambda a: ~a.insna().any())]`
 </v-clicks>
@@ -523,7 +572,7 @@ layout: center
 # III: Third-Party Tools for Typing Pandas
 
 <Transform :scale="1.25">
-<v-clicks depth="3">
+<v-clicks depth="1">
 
 - Many third-party approaches to typing Pandas
 - `pandas-stubs`
@@ -548,10 +597,9 @@ layout: center
 <v-clicks depth="3">
 
 - Pandera
-    - Offers alternative subclasses that are generic
-    - DataFrames must be defined with a Schema class
-    - Pretends Pandas DataFrames are immutable
-- Even if third-party tools exist, is it sensible?
+    - DataFrames must be defined with a Schema `class`
+    - Type DataFrames with these schemas
+- Even if third-party tools exist, is doing this with Pandas sensible?
 
 </v-clicks>
 </Transform>
@@ -626,7 +674,7 @@ def process(
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-- Generic `sf.Frame` takes at least two arguments
+- Generic `sf.Frame` takes two or more arguments
     - Index type
     - Columns type
     - Zero or more columnar value types
@@ -803,7 +851,7 @@ x = process1(v2, q) # no mypy error
 <Transform :scale="1.25">
 <v-clicks depth="3">
 
-- The same type hints can be used for run-time validation
+- The same type hints can be used for runtime validation
 - Deploy with the `sf.CallGuard.check` decorator
 - Runtime validations can be extended with `sf.Require`
 
@@ -860,7 +908,7 @@ x = process3(v3, q)
 ---
 layout: center
 ---
-# But what if variable column counts is appropriate?
+# But what if we need flexible numbers of columns?
 
 
 ---
@@ -886,7 +934,7 @@ layout: center
 <v-clicks depth="3">
 
 - What if we want to be flexible regarding number of columns?
-- Using `Unpack`
+- Using `Unpack` within a `TypeVarTuple`
     - A syntax to define a region of zero or more of the same type
     - Python 3.11: `*tuple[int64, ...]`
     - Pre 3.11: `Unpack[tuple[int64, ...]]`
@@ -1005,9 +1053,9 @@ x = process5(v3, q)
 
 🔎 If you write type hints, check them
 
-♻️ Reuse type-hints for run-time validation with `sf.CallGuard`
+♻️ Reuse type-hints for runtime validation with `sf.CallGuard`
 
-🛡️ Extend run-time validation with `sf.Require`
+🛡️ Extend runtime validation with `sf.Require`
 
 ⚠️ Pandas mutability makes static typing unreliable at best
 
