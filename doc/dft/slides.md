@@ -51,10 +51,10 @@ Creator of StaticFrame, an alternative DataFrame library
 
 - Increase maintainability
     - Code as documentation
-    - Avoid relying on names or comments
+    - Avoid relying just on names or comments
 - Statically verifiable type usage
     - `mypy`, Pyright
-    - IDE integration and autocomplete
+    - IDE integration, autocomplete, AI assistants
 - Run-time validation of type
     - Avoid redundant definitions
     - Prove hints are correct
@@ -88,9 +88,9 @@ Creator of StaticFrame, an alternative DataFrame library
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-- Many important typing utilities are only available in modern Python
+- Many important typing utilities are only available in recent Python
 - Use `typing-extensions>=4.10.0` for back-ports
-- Use latest `mypy` or `Pyright` versions
+- Must use latest `mypy` or `Pyright` versions
 - Use recent packages
     - `static-frame>=2.5.1`
     - `numpy>=1.23.5`
@@ -105,7 +105,7 @@ layout: center
 
 ---
 
-# I: Static Analysis of Type Hints: `mypy`
+# I: Static Analysis: `mypy`
 
 <Transform :scale="1.25">
 
@@ -127,10 +127,9 @@ y: tp.Sequence[int] = process(v=5, q=False)
 
 </Transform>
 
-
 ---
 
-# Static Analysis v Runtime Validation
+# Static Analysis and Runtime Validation
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
@@ -138,11 +137,11 @@ y: tp.Sequence[int] = process(v=5, q=False)
 - Static type analysis is based on markup, not reality
     - Does not affect runtime performance
     - Type annotations can be wrong
-- Reusing type hints for validation ensures coherence
+    - Reusing type hints at runtime ensures coherence
 - Runtime validation
-    - May affect runtime performance
-    - Within a function
-    - With a decorator
+    - Affects runtime performance
+    - Can be done within a function
+    - Can be done with a decorator
 
 </v-clicks>
 </Transform>
@@ -210,11 +209,10 @@ def process(v, q):
 def process(v: int, q: bool) -> list[float]:
     return [x * (0.5 if q else 0.25) for x in range(v)]
 
-z = process(v=6, q='foo')
+z = process(v=5, q=20)
 # static_frame.core.type_clinic.ClinicError:
 # In args of (v: int, q: bool) -> list[float]
 # └── Expected bool, provided int invalid
-
 ```
 </Transform>
 
@@ -230,16 +228,17 @@ layout: center
 
 ---
 
-# II: Type Hinting Collections
+# II: Generic Collections
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-- Collection types can contain other types
+- Generic collection are defined with component types
 - Generic collections permit nested specification
     - `list[float]`
     - `tuple[tuple[int, int], tuple[str, str]]`
 - Generic arguments are positional only
+- Generic arguments are required with `mypy --strict`
 - NumPy 1.20 introduced generic specification of `ndarray`
 
 </v-clicks>
@@ -248,7 +247,7 @@ layout: center
 
 ---
 
-# II: Type Hinting NumPy Arrays: Generic Arguments
+# II: Type Hinting Arrays: Generic Arguments
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
@@ -263,7 +262,7 @@ layout: center
 
 ---
 
-# II: Type Hinting NumPy Arrays: Generic Arguments
+# II: Type Hinting Arrays: Generic Arguments
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
@@ -273,9 +272,9 @@ layout: center
     - Might use `tuple[tp.Literal[4], tp.Literal[12]]` for 2D specification
     - Shape is often a run-time concern
 - `dtype` is itself generic
-    - A NumPy "generic" is the generic argument
-    - Might use `np.dytpe[np.integer]` for any integer type
-    - Might use `np.dtype[np.uint8]` for a narrow specified integer
+    - A NumPy "generic" is the argument
+    - Might use `np.dytpe[np.integer[tp.Any]]` for any integer type
+    - Might use `np.dtype[np.uint8]` for a narrowly specified integer
 
 </v-clicks>
 </Transform>
@@ -283,7 +282,7 @@ layout: center
 
 ---
 
-# II: Type Hinting NumPy Arrays: Practical Approaches
+# II: Type Hinting Arrays: Practical Approaches
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
@@ -292,7 +291,7 @@ layout: center
 - Create type aliases of `np.ndarray` generics
     - `TNDArrayBool = np.ndarray[tp.Any, np.dtype[np.bool_]]`
     - `TNDArrayFloat64 = np.ndarray[tp.Any, np.dtype[np.float64]]`
-    - `TNDArrayIntAny = np.ndarray[tp.Any, np.dtype[np.signedinteger[tp.Any]]]`
+    - `TNDArrayIntAny = np.ndarray[tp.Any, np.dtype[np.integer[tp.Any]]]`
 
 </v-clicks>
 </Transform>
@@ -300,7 +299,7 @@ layout: center
 
 ---
 
-# II: Typing NumPy Arrays: Static Analysis
+# II: Typed Array Static Analysis
 
 <Transform :scale="1.25">
 
@@ -321,7 +320,7 @@ def process1(
 
 ---
 
-# II: Typing NumPy Arrays: Static Analysis
+# II: Typed Array Static Analysis: `mypy`
 
 <Transform :scale="1.25">
 
@@ -345,7 +344,7 @@ y: TNDArrayBool = process1(v1, q)
 
 ---
 
-# II: More with NumPy `generic`
+# II: Flexability with NumPy `generic`s
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
@@ -367,14 +366,14 @@ y: TNDArrayBool = process1(v1, q)
 
 ---
 
-# II: Typing NumPy Arrays: Static Analysis
+# II: Typed Array Static Analysis
 
 <Transform :scale="1.25">
 
 ```python {all|1|2-7|6-10|11|11-}
 TNDArrayIntAny = np.ndarray[tp.Any, np.dtype[np.signedinteger[tp.Any]]]
 def process2(
-        v: TNDArrayIntAny,
+        v: TNDArrayIntAny, # a more flexible interface
         q: TNDArrayBool,
         ) -> TNDArrayFloat64:
     s = np.where(q, 0.5, 0.25)
@@ -393,7 +392,7 @@ x = process2(v3, q)
 
 ---
 
-# II: Typing NumPy Arrays: Runtime Validation
+# II: Typed Array Runtime Validation
 
 <Transform :scale="1.25">
 
@@ -403,27 +402,27 @@ def process3(v: TNDArrayIntAny, q: TNDArrayBool) -> TNDArrayFloat64:
     s = np.where(q, 0.5, 0.25)
     return tp.cast(TNDArrayFloat64, v * s)
 
-x = process3(v1, q)
-x = process3(v2, q)
+x = process3(v1, q) # no error, same as mypy
+x = process3(v2, q) # no error, same as mypy
 v3: TNDArrayFloat64 = np.arange(20, dtype=np.float64) * 0.5
-x = process3(v3, q)
+x = process3(v3, q) # error, same as mypy
 # static_frame.core.type_clinic.ClinicError:
-# In args of (v: ndarray[Any, dtype[signedinteger[Any]]], q: ndarray[Any, dtype[bool_]]) -> ndarray[Any, dtype[float64]]
+# In args of (v: ndarray[Any, dtype[signedinteger[Any]]],
+# q: ndarray[Any, dtype[bool_]]) -> ndarray[Any, dtype[float64]]
 # └── ndarray[Any, dtype[signedinteger[Any]]]
 #     └── dtype[signedinteger[Any]]
 #         └── Expected signedinteger, provided float64 invalid
 ```
 </Transform>
 
-
 ---
 
-# II: Extending Runtime Validation: `sf.Require`
+# II: Extended Validation with `sf.Require`
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-- Shape and other characteristics can be validated at run time.
+- Shape and other characteristics can be validated at runtime.
 - `sf.Require` provides a family of validators
     - `sf.Require.Len`
     - `sf.Require.Shape`
@@ -434,18 +433,17 @@ x = process3(v3, q)
 </v-clicks>
 </Transform>
 
-
 ---
 
-# II: Extending Runtime Validation: `tp.Annotated`
+# II: Using `tp.Annotated`
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
 - `tp.Annotated` permits arbitrary objects to be bundled with type annotations
-- `sf.Require` Deployed within `tp.Annotated`
-    - `TNDArrayInt8` -> `tp.Annotated[TNDArrayInt8, sf.Require.Len(24)]`
-    - `TNDArrayFloat64` -> `tp.Annotated[TNDArrayInt8, sf.Require.Shape(..., 4)]`
+- `sf.Require` is deployed within `tp.Annotated`
+    - `TNDArrayIntAny` -> `tp.Annotated[TNDArrayIntAny, sf.Require.Len(24)]`
+    - `TNDArrayFloat64` -> `tp.Annotated[TNDArrayFloat64, sf.Require.Shape(..., 4), sf.Require.Apply(lambda a: ~a.insna().any())]`
 </v-clicks>
 </Transform>
 
@@ -459,13 +457,13 @@ x = process3(v3, q)
 ```python {all|1|1-5|1-7|9-}
 @sf.CallGuard.check
 def process4(
-        v: tp.Annotated[TNDArrayInt8, sf.Require.Shape(24)],
+        v: tp.Annotated[TNDArrayIntAny, sf.Require.Shape(24)],
         q: tp.Annotated[TNDArrayBool, sf.Require.Shape(24)],
         ) -> tp.Annotated[TNDArrayFloat64, sf.Require.Shape(24)]:
     s = np.where(q, 0.5, 0.25)
     return tp.cast(TNDArrayFloat64, v * s)
 
-x = process4(v1, q)
+x = process4(v1, q) # types pass, but Require.Shape fails
 # static_frame.core.type_clinic.ClinicError:
 # In args of (v: Annotated[ndarray[Any, dtype[int8]], Shape((24,))], q: Annotated[ndarray[Any, dtype[bool_]], Shape((24,))]) -> Annotated[ndarray[Any, dtype[float64]], Shape((24,))]
 # └── Annotated[ndarray[Any, dtype[int8]], Shape((24,))]
@@ -473,9 +471,6 @@ x = process4(v1, q)
 #         └── Expected shape ((24,)), provided shape (20,)
 ```
 </Transform>
-
-
-
 
 
 ---
@@ -513,9 +508,10 @@ layout: center
         - First released in Python 3.11
         - Backward compatibility available with `typing-extensions`
     - Hierarchical indices also require variadic types
-- StaticFrame offers the first fully generic DataFrame
+- StaticFrame 2.0 introduced generic container specfication
+    - Probably the first fully generic DataFrame
     - Supported by an immutable data model
-    - Builds on NumPy's generic specification
+    - Builds on NumPy's types
 - Pandas does not support generic specification
 
 </v-clicks>
