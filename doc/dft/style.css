@@ -4,9 +4,15 @@ h1 {
     font-weight: bold;
 }
 li {
-    margin-top: -4px;
-
+    margin-top: -3px;
 }
+ul {
+    width: 91%;
+}
+pre {
+    width: 91%;
+}
+
 :not(pre) > code::before, :not(pre) > code::after {
 	content: "";
 }

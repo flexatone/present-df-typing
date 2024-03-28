@@ -24,7 +24,7 @@ h1 {font-size: 1.5em;}
 
 # About Me
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 <v-clicks>
 
 CTO at Research Affiliates
@@ -53,7 +53,7 @@ Creator of StaticFrame, an alternative DataFrame library
     - Code as documentation
     - Avoid relying on variable name or comments
 - Statically verifiable type usage
-    - mypy (1.9), Pyright
+    - `mypy`, Pyright
     - IDE integration / autocomplete
 - Run-time validation
     - DRY: avoid redundant validations
@@ -88,7 +88,7 @@ Creator of StaticFrame, an alternative DataFrame library
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-- Many of important typing utilities are only in modern Python
+- Many important typing utilities are only available in modern Python
 - Use `typing-extensions>=4.10.0` for back back-ports
 - Use latest `mypy` or `Pyright` versions
 - Use recent packages
@@ -219,7 +219,7 @@ layout: center
 
 # II: Type Hinting Collections
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 <v-clicks depth="2">
 
 - Collection types can contain other types
@@ -272,7 +272,7 @@ layout: center
 
 # II: Type Hinting NumPy Arrays: Practical Approaches
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 <v-clicks depth="2">
 
 - Ignore shape parameter with `tp.Any`
@@ -475,7 +475,7 @@ layout: center
 
 # III: DataFrames are Collections of Nested Types
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 <v-clicks depth="2">
 
 - Data values are typed by column
@@ -492,7 +492,7 @@ layout: center
 
 # III: The Challenge of a Generic DataFrame
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 <v-clicks depth="2">
 
 - A DataFrame has a variable number of columns (and thus types)
@@ -533,7 +533,7 @@ layout: center
 
 # III: Third-Party Tools for Typing Pandas
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 <v-clicks depth="3">
 
 - Pandera
@@ -550,11 +550,12 @@ layout: center
 
 # III: Statically Typing Mutable Collections is Messy
 
+<Transform :scale="1.25">
 
-<Transform :scale="1.5">
-
-```python {all|1|2|3-4|5|6-}
+```python {all|1|2-3|4|5-6|7|8-}
 >>> s: Series[np.int64] = pd.Series([10, 20, 30])
+>>> s.dtype
+dtype('int64')
 >>> s[2] = 30.5
 >>> s.dtype
 dtype('float64')
@@ -623,7 +624,7 @@ def process(
     - Value type
 - Generic `sf.Index` take one argument: value type
 - `datetime64` indices do not require arguments: `sf.IndexDate`
-- Generic `sf.IndexHierarchy` take one or more `sf.Index` arguements
+- Generic `sf.IndexHierarchy` take one or more `sf.Index` arguments
 
 </v-clicks>
 </Transform>
@@ -635,16 +636,18 @@ layout: center
 # But this is too complex!
 
 
-
 ---
 
 # III: Managing Type Complexity
 
-<Transform :scale="1.5">
-<v-clicks depth="3">
+<Transform :scale="1.25">
+<v-clicks depth="2">
 
+- Reduce the complexity of your interfaces
 - Use type aliases
-- Use "any" aliases in the beginning
+    - `TSeriesDFloat = sf.Series[sf.IndexDate, np.float64]`
+    - `TFrameDateNums = sf.Frame[sf.IndexDate, sf.Index[np.str_], *tuple[np.number[tp.Any], ...]]`
+- Use "any" aliases
     - `sf.TFrameAny`
     - `sf.TSeriesAny`
 
@@ -658,7 +661,7 @@ layout: center
 
 <Transform :scale="1.25">
 
-```python
+```python {all|1|2|3|5-8|5-6|5-7|5-8}
 TFrameDateInts = sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.int64]
 TSeriesYMBool = sf.Series[sf.IndexYearMonth, np.bool_]
 TSeriesDFloat = sf.Series[sf.IndexDate, np.float64]
@@ -677,7 +680,7 @@ def process1(v: TFrameDateInts, q: TSeriesYMBool) -> TSeriesDFloat:
 
 <Transform :scale="1.25">
 
-```python
+```python {all|1-2|4-}
 q: TSeriesYMBool = sf.Series([True, False],
 index=sf.IndexYearMonth.from_date_range('2021-12', '2022-01'))
 
@@ -695,7 +698,7 @@ x = process1(q, q)
 
 <Transform :scale="1.25">
 
-```python
+```python {all|1-2|1-4|6-9|11-12|14}
 # a Frame with an int and float column
 TFrameDateIntFloat = sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.float64]
 v1: TFrameDateIntFloat = sf.Frame.from_fields([range(5), np.arange(3, 8) * 0.5],
@@ -718,7 +721,7 @@ x = process1(v2, q) # no mypy error
 
 # III: Using Type Hints for Runtime Validation
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 <v-clicks depth="3">
 
 - The same type hints can be used for run-time validation
@@ -735,11 +738,11 @@ x = process1(v2, q) # no mypy error
 
 <Transform :scale="1.25">
 
-```python
+```python {all|1-2|4-8|10-}
 # define columns as any type of number
 TFrameDateNum = sf.Frame[sf.IndexDate, sf.Index[np.str_], np.number[tp.Any], np.number[tp.Any]]
 
-@sf.CallGuard.warn
+@sf.CallGuard.check
 def process3(v: TFrameDateNum, q: TSeriesYMBool) -> TSeriesDFloat:
     t = v.index.iter_label().apply(lambda l: q[l.astype('datetime64[M]')]) # type: ignore
     s = np.where(t, 0.5, 0.25)
@@ -758,7 +761,7 @@ x = process3(v2, q)
 
 <Transform :scale="1.25">
 
-```python
+```python {all|1-2|4-5|7-}
 # a Frame of three columns of integers
 TFrameDateIntIntInt = sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.int64, np.int64]
 
@@ -773,6 +776,13 @@ x = process3(v3, q)
 #     └── Expected Frame has 2 dtype, provided Frame has 3 dtype
 ```
 </Transform>
+
+
+---
+layout: center
+---
+# But what if variable column counts is appropriate?
+
 
 ---
 
@@ -829,7 +839,7 @@ x = process3(v3, q)
 
 <Transform :scale="1.25">
 
-```python
+```python {all|1-2|4|4-8|10-}
 # define a Frame with 0 or more numerical columns
 TFrameDateNums = sf.Frame[sf.IndexDate, sf.Index[np.str_], *tuple[np.number[tp.Any], ...]]
 
@@ -886,7 +896,7 @@ TFrameDateNumsValid = sf.Frame[
 
 <Transform :scale="1.25">
 
-```python
+```python {all|1|1-5|7-}
 @sf.CallGuard.check
 def process5(v: TFrameDateNumsValid, q: TSeriesYMBool) -> TSeriesDFloat:
     t = v.index.iter_label().apply(lambda l: q[l.astype('datetime64[M]')]) # type: ignore
@@ -917,7 +927,7 @@ x = process5(v3, q)
 - Reuse type-hints for run-time validation with `sf.CallGuard`
 - Extend run-time validation with `sf.Require`
 - Pandas mutability makes static typing unreliable
-- ... if only there was a DataFrame library built on an immutable data model
+- ... if only there was a DataFrame library built on an immutable data model...
 
 </v-clicks>
 </Transform>
@@ -928,7 +938,7 @@ x = process5(v3, q)
 
 # Thank You
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 
 StaticFrame: https://static-frame.dev
 </Transform>
