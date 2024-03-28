@@ -3,6 +3,10 @@ h1 {
     color: grey;
     font-weight: bold;
 }
+li {
+    margin-top: -4px;
+
+}
 :not(pre) > code::before, :not(pre) > code::after {
 	content: "";
 }

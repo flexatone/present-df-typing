@@ -12,15 +12,15 @@ title: "Improving Code Quality with Array and DataFrame Type Hints"
 
 # Improving Code Quality with Array and DataFrame Type Hints
 
-### Christopher Ariza
-### CTO, Research Affiliates
+<!-- #### Christopher Ariza
+#### CTO, Research Affiliates -->
 
 <style>
 h1 {font-size: 1.5em;}
 </style>
 
 
----
+<!-- ---
 
 # About Me
 
@@ -39,7 +39,7 @@ Since 2012, builder of financial systems in Python
 
 Creator of StaticFrame, an alternative DataFrame library
 </v-clicks>
-</Transform>
+</Transform> -->
 
 
 ---
@@ -47,7 +47,7 @@ Creator of StaticFrame, an alternative DataFrame library
 # Type Hints Improve Code Quality
 
 <Transform :scale="1.25">
-<v-clicks>
+<v-clicks depth="2">
 
 - Increase maintainability
     - Code as documentation
@@ -68,13 +68,15 @@ Creator of StaticFrame, an alternative DataFrame library
 # Type Hints: Not a Free Lunch
 
 <Transform :scale="1.25">
-<v-clicks>
+<v-clicks depth="2">
 
 - Incorrect or invalid type hints are common
     - `from __future__ import annotations` means hints are not evaluated
     - IDE will use what it can without complaint
-    - A potential source of technical debt
-- Use `mypy` or `Pyright` to at least evaluate that hints valid
+    - A source of technical debt
+- Use `mypy` or `Pyright` to at least evaluate that hints are valid
+    - `mypy` offers configuration to incrementally increase strictness
+    - `mypy --strict` is the most strict
 
 </v-clicks>
 </Transform>
@@ -84,9 +86,9 @@ Creator of StaticFrame, an alternative DataFrame library
 # Typing Facilities on the Bleeding Edge
 
 <Transform :scale="1.25">
-<v-clicks>
+<v-clicks depth="2">
 
-- Many of critical typing utilities are only in modern Python
+- Many of important typing utilities are only in modern Python
 - Use `typing-extensions>=4.10.0` for back back-ports
 - Use latest `mypy` or `Pyright` versions
 - Use recent packages
@@ -102,7 +104,7 @@ Creator of StaticFrame, an alternative DataFrame library
 ---
 layout: center
 ---
-# Simple Type hints
+# Elemental type hints
 
 
 
@@ -155,12 +157,13 @@ def process(v, q):
 # I: Runtime Validation: Validators
 
 <Transform :scale="1.25">
-<v-clicks>
+<v-clicks depth="2">
 
-- Use type annotations for run-time checks
+- Reuse type annotations for run-time type checks
 - General-purpose tools
     - `typeguard`
     - `beartype`
+    - `sf.CallGuard`
 </v-clicks>
 </Transform>
 
@@ -173,8 +176,8 @@ def process(v, q):
 <v-clicks>
 
 - Class within StaticFrame
-- Specialized for NumPy and StaticFrame containers
 - Handles standard Python types and collections
+- Specialized for NumPy and StaticFrame containers
 - Deployed as a decorator
     - `sf.CallGuard.check`: raise `ClinicError` on failure
     - `sf.CallGuard.warn`: issue a warning on failure
@@ -217,14 +220,14 @@ layout: center
 # II: Type Hinting Collections
 
 <Transform :scale="1.5">
-<v-clicks>
+<v-clicks depth="2">
 
 - Collection types can contain other types
-- Generic typed collections permit nested specification
+- Generic collections permit nested specification
     - `list[float]`
     - `tuple[tuple[int, int], tuple[str, str]]`
 - Generic arguments are positional only
-- `ndarray` supported Generic specification with NumPy 1.20
+- NumPy 1.20 introduced generic specification of `ndarray`
 
 </v-clicks>
 </Transform>
@@ -235,12 +238,12 @@ layout: center
 # II: Type Hinting NumPy Arrays: Generic Arguments
 
 <Transform :scale="1.25">
-<v-clicks>
+<v-clicks depth="2">
 
-- Generic `np.ndarray` take two arguments
+- Generic `np.ndarray` takes two arguments
     - Shape
     - `dytpe`
-- `np.ndarray[tp.Any, np.dtype[np.float64]]`
+- N-dimensional float array: `np.ndarray[tp.Any, np.dtype[np.float64]]`
 
 </v-clicks>
 </Transform>
@@ -487,35 +490,21 @@ layout: center
 
 ---
 
-# III: The Challenge of Typing DataFrames
+# III: The Challenge of a Generic DataFrame
 
 <Transform :scale="1.5">
 <v-clicks depth="2">
 
 - A DataFrame has a variable number of columns (and thus types)
     - Requires a variadic generic: `TypeVarTuple`
+        - First released in Python 3.11
+        - Backward compatibility available with `typing-extensions`
     - Hierarchical indices also require variadic types
 - Statically typing mutable collection is messy
+- Pandas does not support generic specification
 
 </v-clicks>
 </Transform>
-
-
-
----
-
-# III: Type Annotations with Pandas
-
-<Transform :scale="1.25">
-
-```python
-import pandas as pd
-
-def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
-```
-
-</Transform>
-
 
 
 ---
@@ -525,7 +514,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 <Transform :scale="1.25">
 <v-clicks depth="3">
 
-- Pandas does not support generic specification of containers
+- Many third-party approaches to typing Pandas
 - `pandas-stubs`
     - Built from Microsoft and VirtusLabs
     - Offers a generic `Series` but with an untyped index
@@ -579,7 +568,7 @@ dtype('O')
 
 ---
 
-# III: Shallow DataFrame Typing
+# III: Shallow DataFrame Typing with Pandas
 
 <Transform :scale="1.25">
 
@@ -594,7 +583,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 
 ---
 
-# III: Deep DataFrame Typing
+# III: Deep DataFrame Typing with StaticFrame
 
 <Transform :scale="1.25">
 
@@ -608,15 +597,36 @@ def process(
         ],
     q: sf.Series[
         sf.IndexYearMonth, # type of Series index labels
-        np.bool_,          # type of Index values
+        np.bool_,          # type of Series values
         ],
     ) -> Series[
-        sf.IndexDate,      # type of Series index labels
+        sf.IndexDate,      # type of Series in0dex labels
         np.float64,        # type of Series values
         ]: ...
 ```
 </Transform>
 
+
+---
+
+# III: Deep StaticFrame Typing
+
+<Transform :scale="1.25">
+<v-clicks depth="2">
+
+- Generic `sf.Frame` take at least three arguments
+    - Index type
+    - Columns type
+    - One or more columnar value types
+- Generic `sf.Series` take two arguments
+    - Index type
+    - Value type
+- Generic `sf.Index` take one argument: value type
+- `datetime64` indices do not require arguments: `sf.IndexDate`
+- Generic `sf.IndexHierarchy` take one or more `sf.Index` arguements
+
+</v-clicks>
+</Transform>
 
 
 ---
@@ -625,9 +635,26 @@ layout: center
 # But this is too complex!
 
 
+
 ---
 
-# III: Static Analysis of DataFrames
+# III: Managing Type Complexity
+
+<Transform :scale="1.5">
+<v-clicks depth="3">
+
+- Use type aliases
+- Use "any" aliases in the beginning
+    - `sf.TFrameAny`
+    - `sf.TSeriesAny`
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# III: Typed DataFrame Interfaces
 
 <Transform :scale="1.25">
 
@@ -646,12 +673,14 @@ def process1(v: TFrameDateInts, q: TSeriesYMBool) -> TSeriesDFloat:
 
 ---
 
-# III: Static Analysis of DataFrames: `mypy`
+# III: Typed DataFrame Static Analysis: `mypy`
 
 <Transform :scale="1.25">
 
 ```python
-q: TSeriesYMBool = sf.Series([True, False], index=sf.IndexYearMonth.from_date_range('2021-12', '2022-01'))
+q: TSeriesYMBool = sf.Series([True, False],
+index=sf.IndexYearMonth.from_date_range('2021-12', '2022-01'))
+
 x = process1(q, q)
 # tpst_frame.py: error: Argument 1 to "process1" has incompatible type
 # "Series[IndexYearMonth, bool_]"; expected
@@ -662,13 +691,13 @@ x = process1(q, q)
 
 ---
 
-# III: Static Analysis of DataFrames: `mypy`
+# III: Typed DataFrame Static Analysis: `mypy`
 
 <Transform :scale="1.25">
 
 ```python
+# a Frame with an int and float column
 TFrameDateIntFloat = sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.float64]
-
 v1: TFrameDateIntFloat = sf.Frame.from_fields([range(5), np.arange(3, 8) * 0.5],
 columns=('a', 'b'), index=sf.IndexDate.from_date_range('2021-12-30', '2022-01-03'))
 
@@ -680,18 +709,34 @@ x = process1(v1, q)
 v2: TFrameDateInts = sf.Frame.from_fields([range(5), range(3, 8)],
 columns=('a', 'b'), index=sf.IndexDate.from_date_range('2021-12-30', '2022-01-03'))
 
-x = process1(v2, q)
+x = process1(v2, q) # no mypy error
 ```
 </Transform>
 
 
 ---
 
-# III: Runtime Analysis of DataFrames: `CallGuard`
+# III: Using Type Hints for Runtime Validation
+
+<Transform :scale="1.5">
+<v-clicks depth="3">
+
+- The same type hints can be used for run-time validation
+- Deploy with the `sf.CallGuard.check` decorator
+- Runtime validations can be extended with `sf.Require`
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# III: DataFrame Runtime Validation: `CallGuard`
 
 <Transform :scale="1.25">
 
 ```python
+# define columns as any type of number
 TFrameDateNum = sf.Frame[sf.IndexDate, sf.Index[np.str_], np.number[tp.Any], np.number[tp.Any]]
 
 @sf.CallGuard.warn
@@ -700,27 +745,30 @@ def process3(v: TFrameDateNum, q: TSeriesYMBool) -> TSeriesDFloat:
     s = np.where(t, 0.5, 0.25)
     return tp.cast(TSeriesDFloat, (v.via_T * s).mean(axis=1))
 
+# no mypy error with floats or ints
 x = process3(v1, q)
 x = process3(v2, q)
-
 ```
 </Transform>
 
 
 ---
 
-# III: Runtime Analysis of DataFrames: `CallGuard`
+# III: DataFrame Runtime Validation: `CallGuard`
 
 <Transform :scale="1.25">
 
 ```python
+# a Frame of three columns of integers
 TFrameDateIntIntInt = sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.int64, np.int64]
 
-v3: TFrameDateIntIntInt = sf.Frame.from_fields([range(5), range(3, 8), range(1, 6)], columns=('a', 'b', 'c'), index=sf.IndexDate.from_date_range('2021-12-30', '2022-01-03'))
+v3: TFrameDateIntIntInt = sf.Frame.from_fields([range(5), range(3, 8), range(1, 6)],
+columns=('a', 'b', 'c'), index=sf.IndexDate.from_date_range('2021-12-30', '2022-01-03'))
 
 x = process3(v3, q)
 # static_frame.core.type_clinic.ClinicError:
-# In args of (v: Frame[IndexDate, Index[str_], number[Any], number[Any]], q: Series[IndexYearMonth, bool_]) -> Series[IndexDate, float64]
+# In args of (v: Frame[IndexDate, Index[str_], number[Any], number[Any]],
+# q: Series[IndexYearMonth, bool_]) -> Series[IndexDate, float64]
 # └── Frame[IndexDate, Index[str_], number[Any], number[Any]]
 #     └── Expected Frame has 2 dtype, provided Frame has 3 dtype
 ```
@@ -728,47 +776,61 @@ x = process3(v3, q)
 
 ---
 
-# III: Expressive Properties of `TypeVarTuple`
+# III: Expressive Usage of `TypeVarTuple`
 
 <Transform :scale="1.25">
 <v-clicks depth="3">
 
 - Many ways to provide type arguments to a `TypeVarTuple` region
-- Variadic: different numbers of args
+- A variadic generic means a variable numbers of args
     - `Frame[IndexDate, Index[str_], int64]`
-    - `Frame[IndexDate, Index[str_], int64, bool_, float64`
+    - `Frame[IndexDate, Index[str_], int64, int64, int64, bool_, float64`
 
 </v-clicks>
 </Transform>
 
 ---
 
-# III: Expressive Properties of `TypeVarTuple`
+# III: Expressive Usage of `TypeVarTuple`
 
 <Transform :scale="1.25">
 <v-clicks depth="3">
 
+- What if we want to be flexible regarding number of columns?
 - Using `Unpack`
     - A syntax to define a region of zero or more of the same type
-    - In Python 3.11 can use `*tuple[int64, ...]` syntax
-    - Pre 3.11 can use `Unpack[tuple[int64, ...]]`
+    - Python 3.11: `*tuple[int64, ...]`
+    - Pre 3.11: `Unpack[tuple[int64, ...]]`
+
+</v-clicks>
+</Transform>
+
+---
+
+# III: Expressive Usage of `Unpack`
+
+<Transform :scale="1.25">
+<v-clicks depth="3">
+
+- A single `Unpack` can express zero or more columns of the same type
     - `Frame[IndexDate, Index[str_], *tuple[int64, ...]]`
-- Combinations on explicit types with one `Unpack`
-    - One `Unpack` can be mixed with explicit variadic args
+- Can combine explicit types with one `Unpack`
     - `Frame[IndexDate, Index[str_], bool_, *tuple[int64, ...]]`
-    - `Frame[IndexDate, Index[str_], bool_, *tuple[int64, ...], bool_]`
+    - `Frame[IndexDate, Index[str_], *tuple[int64, ...], float64]`
 
 </v-clicks>
 </Transform>
 
 
+
 ---
 
-# III: Runtime Analysis of DataFrames: `CallGuard`
+# III: DataFrame Runtime Validation: `CallGuard`
 
 <Transform :scale="1.25">
 
 ```python
+# define a Frame with 0 or more numerical columns
 TFrameDateNums = sf.Frame[sf.IndexDate, sf.Index[np.str_], *tuple[np.number[tp.Any], ...]]
 
 @sf.CallGuard.check
@@ -777,27 +839,41 @@ def process4(v: TFrameDateNums, q: TSeriesYMBool) -> TSeriesDFloat:
     s = np.where(t, 0.5, 0.25)
     return tp.cast(TSeriesDFloat, (v.via_T * s).mean(axis=1))
 
+# a Frame with three integer columns passes
 x = process4(v3, q)
 ```
 </Transform>
 
 
+---
+
+# III: Extended Runtime Validation
+
+<Transform :scale="1.25">
+<v-clicks depth="3">
+
+- If already checking types, why not other attributes?
+- Can use `tp.Annotated` to bundle `sf.Require`-defined checks
+
+</v-clicks>
+</Transform>
+
 
 ---
 
-# III: Runtime Analysis of DataFrames: `CallGuard` and `Require`
+# III: DataFrame Runtime Validation: `CallGuard` and `Require`
 
 <Transform :scale="1.25">
 
-```python
+```python {all|1|2|2-3|2-4|5|5-6|5-7|8|all}
 TFrameDateNumsValid = sf.Frame[
     tp.Annotated[
-        sf.IndexDate,
-        sf.Require.Len(10)],
+        sf.IndexDate,                           # type of Frame index labels
+        sf.Require.Len(10)],                    # require length of 10
     tp.Annotated[
-        sf.Index[np.str_],
-        sf.Require.LabelsOrder('a', 'b', ...)],
-    *tuple[np.number[tp.Any], ...]
+        sf.Index[np.str_],                      # type of Frame column labels
+        sf.Require.LabelsOrder('a', 'b', ...)], # require first two labels
+    *tuple[np.number[tp.Any], ...]              # type of Frame columns
     ]
 
 ```
@@ -806,7 +882,7 @@ TFrameDateNumsValid = sf.Frame[
 
 ---
 
-# III: Runtime Analysis of DataFrames: `CallGuard` and `Require`
+# III: DataFrame Runtime Validation: `CallGuard` and `Require`
 
 <Transform :scale="1.25">
 
@@ -828,6 +904,23 @@ x = process5(v3, q)
 </Transform>
 
 
+
+---
+
+# Conclusion
+
+<Transform :scale="1.25">
+<v-clicks depth="3">
+
+- Type annotations improve code quality
+- If you write type hints, check them
+- Reuse type-hints for run-time validation with `sf.CallGuard`
+- Extend run-time validation with `sf.Require`
+- Pandas mutability makes static typing unreliable
+- ... if only there was a DataFrame library built on an immutable data model
+
+</v-clicks>
+</Transform>
 
 
 
