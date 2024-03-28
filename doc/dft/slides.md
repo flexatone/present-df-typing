@@ -51,12 +51,12 @@ Creator of StaticFrame, an alternative DataFrame library
 
 - Increase maintainability
     - Code as documentation
-    - Avoid relying on variable name or comments
+    - Avoid relying on names or comments
 - Statically verifiable type usage
     - `mypy`, Pyright
-    - IDE integration / autocomplete
-- Run-time validation
-    - DRY: avoid redundant validations
+    - IDE integration and autocomplete
+- Run-time validation of type
+    - Avoid redundant definitions
     - Prove hints are correct
 
 </v-clicks>
@@ -65,7 +65,7 @@ Creator of StaticFrame, an alternative DataFrame library
 
 ---
 
-# Type Hints: Not a Free Lunch
+# Type Hints Are Not a Free Lunch
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
@@ -76,7 +76,7 @@ Creator of StaticFrame, an alternative DataFrame library
     - A source of technical debt
 - Use `mypy` or `Pyright` to at least evaluate that hints are valid
     - `mypy` offers configuration to incrementally increase strictness
-    - `mypy --strict` is the most strict
+    - `mypy --strict` is used here
 
 </v-clicks>
 </Transform>
@@ -89,7 +89,7 @@ Creator of StaticFrame, an alternative DataFrame library
 <v-clicks depth="2">
 
 - Many important typing utilities are only available in modern Python
-- Use `typing-extensions>=4.10.0` for back back-ports
+- Use `typing-extensions>=4.10.0` for back-ports
 - Use latest `mypy` or `Pyright` versions
 - Use recent packages
     - `static-frame>=2.5.1`
@@ -98,15 +98,10 @@ Creator of StaticFrame, an alternative DataFrame library
 </v-clicks>
 </Transform>
 
-
-
-
 ---
 layout: center
 ---
 # Elemental type hints
-
-
 
 ---
 
@@ -115,7 +110,7 @@ layout: center
 <Transform :scale="1.25">
 
 ```python {all|1|3-4|6-8|10-13}
-def process(v, q): ...
+def process(v, q): ... # no type information
 
 # adding type hints
 def process(v: int, q: bool) -> list[float]: ...
@@ -135,7 +130,26 @@ y: tp.Sequence[int] = process(v=5, q=False)
 
 ---
 
-# I: Runtime Validation
+# Static Analysis v Runtime Validation
+
+<Transform :scale="1.25">
+<v-clicks depth="2">
+
+- Static type analysis is based on markup, not reality
+    - Does not affect runtime performance
+    - Type annotations can be wrong
+- Reusing type hints for validation ensures coherence
+- Runtime validation
+    - May affect runtime performance
+    - Within a function
+    - With a decorator
+
+</v-clicks>
+</Transform>
+
+---
+
+# I: Runtime Validation within a Function
 
 <Transform :scale="1.25">
 
@@ -154,13 +168,12 @@ def process(v, q):
 
 ---
 ---
-# I: Runtime Validation: Validators
+# I: Runtime Validation with a Decorator
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
 - Reuse type annotations for run-time type checks
-- General-purpose tools
     - `typeguard`
     - `beartype`
     - `sf.CallGuard`
@@ -173,7 +186,7 @@ def process(v, q):
 # I: Runtime Validation: `CallGuard`
 
 <Transform :scale="1.25">
-<v-clicks>
+<v-clicks depth="2">
 
 - Class within StaticFrame
 - Handles standard Python types and collections
@@ -187,7 +200,7 @@ def process(v, q):
 
 ---
 ---
-# I: Runtime Validation
+# I: Runtime Validation: `CallGuard`
 
 <Transform :scale="1.25">
 
@@ -291,7 +304,7 @@ layout: center
 
 <Transform :scale="1.25">
 
-```python {all|1-3|5|5-6|5-7|5-8|5-9|5-10}
+```python {all|1|2|3|5-6|5-7|5-8|5-9|5-10}
 TNDArrayBool = np.ndarray[tp.Any, np.dtype[np.bool_]]
 TNDArrayInt8 = np.ndarray[tp.Any, np.dtype[np.int8]]
 TNDArrayFloat64 = np.ndarray[tp.Any, np.dtype[np.float64]]
@@ -882,7 +895,7 @@ TFrameDateNumsValid = sf.Frame[
         sf.Require.Len(10)],                    # require length of 10
     tp.Annotated[
         sf.Index[np.str_],                      # type of Frame column labels
-        sf.Require.LabelsOrder('a', 'b', ...)], # require first two labels
+        sf.Require.LabelsOrder('a', 'b', ...)], # require first two labels to be 'a', 'b'
     *tuple[np.number[tp.Any], ...]              # type of Frame columns
     ]
 
