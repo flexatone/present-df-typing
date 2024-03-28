@@ -513,7 +513,9 @@ layout: center
         - First released in Python 3.11
         - Backward compatibility available with `typing-extensions`
     - Hierarchical indices also require variadic types
-- Statically typing mutable collection is messy
+- StaticFrame offers the first fully generic DataFrame
+    - Supported by an immutable data model
+    - Builds on NumPy's generic specification
 - Pandas does not support generic specification
 
 </v-clicks>
@@ -552,7 +554,7 @@ layout: center
 - Pandera
     - Offers alternative subclasses that are generic
     - DataFrames must be defined with a Schema class
-    - Assumes immutability
+    - Pretends Pandas DataFrames are immutable
 - Even if third-party tools exist, is it sensible?
 
 </v-clicks>
@@ -565,7 +567,7 @@ layout: center
 
 <Transform :scale="1.25">
 
-```python {all|1|2-3|4|5-6|7|8-}
+```python {all|1|2-3|4|5-6|7|8-|all}
 >>> s: Series[np.int64] = pd.Series([10, 20, 30])
 >>> s.dtype
 dtype('int64')
@@ -582,7 +584,7 @@ dtype('O')
 
 ---
 
-# III: Shallow DataFrame Typing with Pandas
+# III: Pandas Only Permits Shallow DataFrame Typing
 
 <Transform :scale="1.25">
 
@@ -597,7 +599,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 
 ---
 
-# III: Deep DataFrame Typing with StaticFrame
+# III: StaticFrame Offers Deep DataFrame Typing
 
 <Transform :scale="1.25">
 
@@ -623,15 +625,15 @@ def process(
 
 ---
 
-# III: Deep StaticFrame Typing
+# III: Generic Containers in StaticFrame
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-- Generic `sf.Frame` take at least three arguments
+- Generic `sf.Frame` takes at least two arguments
     - Index type
     - Columns type
-    - One or more columnar value types
+    - Zero or more columnar value types
 - Generic `sf.Series` take two arguments
     - Index type
     - Value type
@@ -656,16 +658,84 @@ layout: center
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-- Reduce the complexity of your interfaces
+- Reduce the complexity of your interfaces!
 - Use type aliases
     - `TSeriesDFloat = sf.Series[sf.IndexDate, np.float64]`
     - `TFrameDateNums = sf.Frame[sf.IndexDate, sf.Index[np.str_], *tuple[np.number[tp.Any], ...]]`
 - Use "any" aliases
     - `sf.TFrameAny`
     - `sf.TSeriesAny`
+- Discover the type annotation from the container: `via_type_clinic`
 
 </v-clicks>
 </Transform>
+
+
+---
+
+# III: Discovering Annotations from Containers
+
+<Transform :scale="1.25">
+
+```python {all|1-2|3-12|14-}
+>>> v1 = sf.Frame.from_fields([range(5), np.arange(3, 8) * 0.5],
+columns=('a', 'b'), index=sf.IndexDate.from_date_range('2021-12-30', '2022-01-03'))
+>>> v1
+<Frame>
+<Index>         a       b         <<U1>
+<IndexDate>
+2021-12-30      0       1.5
+2021-12-31      1       2.0
+2022-01-01      2       2.5
+2022-01-02      3       3.0
+2022-01-03      4       3.5
+<datetime64[D]> <int64> <float64>
+
+# get a string representation of the annotation
+>>> v1.via_type_clinic
+Frame[IndexDate, Index[str_], int64, float64]
+```
+</Transform>
+
+---
+
+# III: Discovering Annotations from Containers
+
+<Transform :scale="1.25">
+
+```python {all}
+# get type objects
+>>> v1.via_type_clinic.to_hint()
+static_frame.core.frame.Frame[static_frame.core.index_datetime.IndexDate,
+static_frame.core.index.Index[numpy.str_], numpy.int64, numpy.float64]
+```
+</Transform>
+
+
+---
+
+# III: Checking Types at Runtime
+
+<Transform :scale="1.25">
+
+```python {all|1-2|4-}
+>>> v2 = sf.Frame.from_fields([range(5), range(3, 8)],
+columns=('a', 'b'), index=sf.IndexDate.from_date_range('2021-12-30', '2022-01-03'))
+
+# can validate v1 against the hint of v2
+>>> v1.via_type_clinic.check(v2.via_type_clinic.to_hint())
+static_frame.core.type_clinic.ClinicError:
+In Frame[IndexDate, Index[str_], int64, int64]
+└── Expected int64, provided float64 invalid
+```
+</Transform>
+
+
+---
+layout: center
+---
+# Fully typed DataFrame interfaces
+
 
 
 ---
@@ -935,12 +1005,17 @@ x = process5(v3, q)
 <Transform :scale="1.25">
 <v-clicks depth="3">
 
-- Type annotations improve code quality
-- If you write type hints, check them
-- Reuse type-hints for run-time validation with `sf.CallGuard`
-- Extend run-time validation with `sf.Require`
-- Pandas mutability makes static typing unreliable
-- ... if only there was a DataFrame library built on an immutable data model...
+✨ Type annotations improve code quality
+
+🔎 If you write type hints, check them
+
+♻️ Reuse type-hints for run-time validation with `sf.CallGuard`
+
+🛡️ Extend run-time validation with `sf.Require`
+
+⚠️ Pandas mutability makes static typing unreliable at best
+
+🗜️ StaticFrame's immutable data model supports static typing
 
 </v-clicks>
 </Transform>
