@@ -11,12 +11,11 @@ def process1(
         v: TNDArrayInt8,
         q: TNDArrayBool,
         ) -> TNDArrayFloat64:
-    s = np.where(q, 0.5, 0.25)
-    return tp.cast(TNDArrayFloat64, v * s)
+    s: TNDArrayFloat64 = np.where(q, 0.5, 0.25)
+    return v * s
 
 
 v1: TNDArrayInt8 = np.arange(20, dtype=np.int8)
-q: TNDArrayBool = np.arange(20) % 3 == 0
 x = process1(v1, v1)
 # tp_np.py:23: error: Argument 2 to "process1" has incompatible type "ndarray[Any, dtype[floating[_64Bit]]]"; expected "ndarray[Any, dtype[bool_]]"  [arg-type]
 
@@ -36,8 +35,8 @@ def process2(
         v: TNDArrayIntAny,
         q: TNDArrayBool,
         ) -> TNDArrayFloat64:
-    s = np.where(q, 0.5, 0.25)
-    return tp.cast(TNDArrayFloat64, v * s)
+    s: TNDArrayFloat64 = np.where(q, 0.5, 0.25)
+    return v * s
 
 x = process2(v1, q)
 x = process2(v2, q)
@@ -50,8 +49,8 @@ def process3(
         v: TNDArrayIntAny,
         q: TNDArrayBool,
         ) -> TNDArrayFloat64:
-    s = np.where(q, 0.5, 0.25)
-    return tp.cast(TNDArrayFloat64, v * s)
+    s: TNDArrayFloat64 = np.where(q, 0.5, 0.25)
+    return v * s
 
 x = process3(v1, q)
 x = process3(v2, q)
