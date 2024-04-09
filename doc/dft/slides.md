@@ -12,15 +12,14 @@ title: "Improving Code Quality with Array and DataFrame Type Hints"
 
 # Improving Code Quality with Array and DataFrame Type Hints
 
-<!-- #### Christopher Ariza
-#### CTO, Research Affiliates -->
+#### Christopher Ariza
+#### CTO, Research Affiliates
 
 <style>
 h1 {font-size: 1.5em;}
 </style>
 
-
-<!-- ---
+---
 
 # About Me
 
@@ -39,7 +38,7 @@ Since 2012, builder of financial systems in Python
 
 Creator of StaticFrame, an alternative DataFrame library
 </v-clicks>
-</Transform> -->
+</Transform>
 
 
 ---
