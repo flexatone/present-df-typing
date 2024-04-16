@@ -165,10 +165,10 @@ x = process(v=5, q=20)
 # tp_basic.py: error: Argument "q" to "process"
 # has incompatible type "int"; expected "bool"  [arg-type]
 
-y: tp.Sequence[int] = process(v=5, q=False)
+y: list[int] = process(v=5, q=False)
 # tp_basic.py: error: Incompatible types in assignment
 # (expression has type "list[float]", variable has type
-# "Sequence[int]")  [assignment]
+# "list[int]")  [assignment]
 ```
 
 </Transform>
