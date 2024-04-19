@@ -423,8 +423,8 @@ def process2(
         v: TNDArrayIntAny, # a more flexible interface
         q: TNDArrayBool,
         ) -> TNDArrayFloat64:
-    s = np.where(q, 0.5, 0.25)
-    return tp.cast(TNDArrayFloat64, v * s)
+    s: TNDArrayFloat64 = np.where(q, 0.5, 0.25)
+    return v * s
 
 x = process2(v1, q) # no mypy error
 x = process2(v2, q) # no mypy error
@@ -446,8 +446,8 @@ x = process2(v3, q)
 ```python {all|1|1-4|6-7|8|8-}
 @sf.CallGuard.check
 def process3(v: TNDArrayIntAny, q: TNDArrayBool) -> TNDArrayFloat64:
-    s = np.where(q, 0.5, 0.25)
-    return tp.cast(TNDArrayFloat64, v * s)
+    s: TNDArrayFloat64 = np.where(q, 0.5, 0.25)
+    return v * s
 
 x = process3(v1, q) # no error, same as mypy
 x = process3(v2, q) # no error, same as mypy
@@ -508,8 +508,8 @@ def process4(
         v: tp.Annotated[TNDArrayIntAny, sf.Require.Shape(24)],
         q: tp.Annotated[TNDArrayBool, sf.Require.Shape(24)],
         ) -> tp.Annotated[TNDArrayFloat64, sf.Require.Shape(24)]:
-    s = np.where(q, 0.5, 0.25)
-    return tp.cast(TNDArrayFloat64, v * s)
+    s: TNDArrayFloat64 = np.where(q, 0.5, 0.25)
+    return v * s
 
 x = process4(v1, q) # types pass, but Require.Shape fails
 # static_frame.core.type_clinic.ClinicError:
