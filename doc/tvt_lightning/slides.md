@@ -72,6 +72,7 @@ h1 {font-size: 1.5em;}
 <Transform :scale="1.25">
 <v-clicks depth="3">
 
+- New in Python 3.11 (PEP XXX)
 - Define a type variable region of zero or more generic specifications
 - Can follow and/or proceed positional type vars
 - Can express zero or more generics of the same type
