@@ -53,13 +53,13 @@ h1 {font-size: 1.5em;}
 
 - Some types might vary the number of generics needed
 - Typing the shape of n-dimensional array
-    - Array[tp.Literal[4]]
-    - Array[tp.Literal[4], tp.Literal[8]]
-    - Array[tp.Literal[4], tp.Literal[8], tp.Literal[6]]
+    - ``Array[tp.Literal[4]]``
+    - ``Array[tp.Literal[4], tp.Literal[8]]``
+    - ``Array[tp.Literal[4], tp.Literal[8], tp.Literal[6]]``
 - Typing the columns of variable sized table
-    - Table[int]
-    - Table[int, str]
-    - Table[int, str, flaot]
+    - ``Table[int]``
+    - ``Table[int, str]``
+    - ``Table[int, str, float]``
 
 </v-clicks>
 </Transform>
