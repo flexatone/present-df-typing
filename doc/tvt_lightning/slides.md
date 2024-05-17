@@ -38,7 +38,6 @@ Permit specification of generic component types with `TypeVar`
 >>> class Map(Generic[TK, TV]): ...
 >>> m1 = Map[int, str]()
 >>> m2 = Map[str, int]()
->>> m3 = Map[tuple[str, int], int]()
 ```
 
 </v-clicks>
@@ -56,7 +55,7 @@ Generics without explicit `TypeVar`
 
 ```python {1|2}
 >>> class Map[TK, TV]: ...
->>> m3 = Map[tuple[str, int], int]()
+>>> m = Map[str, int]()
 ```
 
 </v-clicks>
@@ -69,8 +68,6 @@ Generics without explicit `TypeVar`
 
 <Transform :scale="1.5">
 <v-clicks depth="3">
-
-Python generic specification is limited
 
 `TypeVar`s have to be positional (no kwargs)
 
@@ -96,14 +93,14 @@ layout: center
 
 ---
 
-# Variadic Generics
+# Variable Number of Generics?
 
 <Transform :scale="1.5">
 <v-clicks depth="3">
 
-Some types might benefit from a variable numbers of generics
-
 N-dimensional arrays
+
+Do not want to have a different class for 1D, 2D, 3D, etc.
 
 ```python {1|2|3}
 >>> class Array1D[TDtype, TLen1]: ...
@@ -124,9 +121,9 @@ N-dimensional arrays
 
 New in Python 3.11 (PEP 646)
 
-Define a type positional region of zero or more generic specifications
+Define region of zero or more generic specifications
 
-Can follow or proceed positional `TypeVar`s
+Can follow or proceed `TypeVar`s
 
 Can conveniently express zero or more generics of the same type
 
@@ -136,39 +133,60 @@ Can conveniently express zero or more generics of the same type
 
 ---
 
-# A Type with a Variable Number of Generics
+# `TypeVarTuple` < 3.12
 
 <Transform :scale="1.5">
 <v-clicks depth="3">
 
-N-dimensional arrays with zero or more dimensional size specifications
+An `Array` with a dtype type and zero or more axis length types
 
-```python {1|2|3|4}
->>> class Array[TDtype, *TShape]: ...
->>> a1: Array[float, Literal[10]]
->>> a2: Array[float, Literal[10], Literal[20]]
->>> a2: Array[float, Any, Literal[20]]
+``` python {1|2|3}
+>>> TDtype = TypeVar('TDtype')
+>>> TAxis = TypeVarTuple('TAxis')
+>>> class Array(Generic[TDtype, Unpack[TAxis]]):
 ```
 
 </v-clicks>
 </Transform>
 
 
+
 ---
 
-# A Type with a Variable Number of Generics
+# `TypeVarTuple` >= 3.12
 
 <Transform :scale="1.5">
 <v-clicks depth="3">
 
-Can use `Unpack` syntax to specify zero or more of the same type
+An `Array` with a dtype type and zero or more axis length types
 
-Can combine with explicit types
+```python {1|2|3|4}
+>>> class Array[TDtype, *TShape]: ...
+>>> a1: Array[float, Literal[10]] # 1D shape (10,)
+>>> a2: Array[float, Literal[10], Literal[20]] # 2D shape (10, 20)
+>>> a3: Array[float, Any, Literal[20]] # 2D shape (*, 20)
+```
+
+</v-clicks>
+</Transform>
+
+
+
+---
+
+# Expressive Opportunities of `TypeVarTuple`
+
+<Transform :scale="1.5">
+<v-clicks depth="3">
+
+Can use `Unpack` (< 3.11) or `*` (>= 3.11) syntax to specify zero or more of the same type
+
+Can combine with fixed types for the same `TypeVarTuple` region
 
 ```python {1|2|3}
 >>> class Array[TDtype, *TShape]: ...
->>> a1: Array[float, *Literal[10]]
->>> a2: Array[float, Literal[5], *tuple[Literal[10], ...]]
+>>> a1: Array[float, *tuple[Literal[10], ...]] # ND of length 10
+>>> a2: Array[float, Literal[5], *tuple[Any, ...]] # ND with first of length 5
 ```
 
 </v-clicks>
@@ -191,7 +209,9 @@ layout: center
 
 Defined generic specification of `ndarray` before `TypeVarTuple`
 
-First argument for shape not yet standardized
+First argument for shape is just a `TypeVar`
+
+Usage not yet standardized
 
 ```python {1|2|3}
 >>> class ndarray[TShape, TDtype]: ...
@@ -205,10 +225,12 @@ First argument for shape not yet standardized
 
 ---
 
-# Component Types of DataFrames
+# DataFrames
 
 <Transform :scale="1.5">
 <v-clicks depth="3">
+
+Numerous component types
 
 Row label type
 
@@ -229,7 +251,7 @@ A variable number of columnar types
 
 A DataFrame library built on an immutable data model
 
-With version 2.0, introduces a variadic generic DataFrame
+Version 2 introduces a variadic generic DataFrame
 
 </v-clicks>
 </Transform>
@@ -237,7 +259,7 @@ With version 2.0, introduces a variadic generic DataFrame
 
 ---
 
-# Components of a Generic DataFrame
+# Fully Typed DataFrames
 
 <Transform :scale="1.5">
 <v-clicks depth="1">
@@ -259,7 +281,7 @@ With version 2.0, introduces a variadic generic DataFrame
 
 ---
 
-# Components of a Generic DataFrame
+# Fully Typed DataFrames
 
 <Transform :scale="1.5">
 <v-clicks depth="1">
@@ -282,7 +304,7 @@ With version 2.0, introduces a variadic generic DataFrame
 
 ---
 
-# Generics with Expressive `Unpack` Syntax
+# Variadic Typed DataFrames
 
 <Transform :scale="1.5">
 <v-clicks depth="1">
@@ -292,7 +314,7 @@ With version 2.0, introduces a variadic generic DataFrame
         sf.Index[np.int64],
         sf.Index[np.str_],
         np.bool_,
-        *tuple[np.float64, ...],
+        *tuple[np.float64, ...], # zero or more float64 columns
         ]()
 ```
 
@@ -302,7 +324,7 @@ With version 2.0, introduces a variadic generic DataFrame
 
 ---
 
-# Generics with Expressive `Unpack` Syntax
+# Variadic Typed DataFrames
 
 <Transform :scale="1.5">
 <v-clicks depth="1">
@@ -312,7 +334,7 @@ With version 2.0, introduces a variadic generic DataFrame
         sf.IndexDate,
         sf.Index[np.str_],
         np.bool_,
-        *tuple[np.int64, ...],
+        *tuple[np.int64, ...], # zero or more float64 columns
         np.str_,
         np.str_,
         ]()
@@ -320,7 +342,6 @@ With version 2.0, introduces a variadic generic DataFrame
 
 </v-clicks>
 </Transform>
-
 
 
 ---
@@ -341,6 +362,7 @@ Run-time validation with `sf.CallGuard`
 
 
 
+
 ---
 
 # Liberate your Generics
@@ -350,7 +372,7 @@ Run-time validation with `sf.CallGuard`
 
 Your types might benefit from `TypeVarTuple`
 
-Variadic generic DataFrames are available in StaticFrame
+Variadic generic DataFrames in StaticFrame
 
 </v-clicks>
 </Transform>
