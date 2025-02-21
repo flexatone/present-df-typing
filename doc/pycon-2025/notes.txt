@@ -5,15 +5,7 @@
 
 
 # Elastic Generics: Flexible Static Typing with TypeVarTuple and Unpack
-# Making Static Typing Flexible and Elastic with TypeVarTuple and Unpack
-# Expressive Static Typing with TypeVarTuple and Unpack
-# Flexible Static Typing with TypeVarTuple and Unpack
-# The New Typing Opportunities Offered by TypeVarTuple and Unpack
-<!--
-Typing Variable Sized Data Records...
-How TypeVarTuple (pep xxx) Permits Flexible and Expressive Static Typing
-ragged sequence types
--->
+
 
 
 Since Python 3.5, generic tuples can be parameterized as either orderings of component types (e.g. `tuple[int, str]`) or unbound sequences of a single type (e.g. `tuple[float, ...]`). Yet sometimes we need both: for example, a `tuple` that starts with an `int` and a `str` and follows with zero or more `float`s might describe a row in a dataset that starts with identifiers and follows with a variable number of observations. While we might want to define a generic `Record` class that can be elastically parameterized in this manner, doing so was not practical until the introduction of `TypeVarTuple` and `Unpack` in Python 3.11.
