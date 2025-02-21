@@ -6,11 +6,11 @@ lineNumbers: false
 transition: slide-left
 aspectRatio: 16/9
 favicon: /favicon.ico
-title: "Liberate your Generics with TypeVarTuple"
+title: "Elastic Generics: Flexible Static Typing with TypeVarTuple and Unpack"
 
 ---
 
-# Liberate your Generics with `TypeVarTuple`
+# Elastic Generics: Flexible Static Typing with TypeVarTuple and Unpack
 
 <!-- Liberate your Python Generics with TypeVarTuple -->
 
