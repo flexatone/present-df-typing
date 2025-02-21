@@ -23,27 +23,6 @@ h1 {font-size: 1.5em;}
 
 
 
----
-
-# About Me
-
-<Transform :scale="1.25">
-<v-clicks>
-
-CTO at Research Affiliates
-
-Python programmer since 2000
-
-PhD in music composition, professor of music technology
-
-Python for algorithmic composition, computational musicology
-
-Since 2012, builder of financial systems in Python
-
-Creator of StaticFrame, an alternative DataFrame library
-</v-clicks>
-</Transform>
-
 
 
 ---
@@ -133,26 +112,195 @@ def process(
 
 
 
+---
+
+# Defining Generics in Python (< 3.12)
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+Subclass from `Generic`
+
+Provide `TypeVar` to `Generic` to specify type variables
+
+```python
+TK = TypeVar('TK')
+TV = TypeVar('TV')
+
+class Map(Generic[TK, TV]):
+    def keys() -> Iterator[TK]: ...
+    def values() -> Iterator[TV]: ...
+    def items() -> Iterator[tuple[TK, TV]]: ...
+
+m1 = Map[str, bool]()
+```
+
+</v-clicks>
+</Transform>
 
 
 
 
 ---
 
-# Generics in Python
+# Defining Generics in Python (>= 3.12)
 
 <Transform :scale="1.5">
 <v-clicks depth="1">
 
-Permit specification of generic component types with `TypeVar`
 
-```python {1-2|1-3|4|5|6}
->>> TK = TypeVar('TK')
->>> TV = TypeVar('TV')
->>> class Map(Generic[TK, TV]): ...
->>> m1 = Map[int, str]()
->>> m2 = Map[str, int]()
+```python
+class Map[TK, TV]:
+    def keys() -> Iterator[TK]: ...
+    def values() -> Iterator[TV]: ...
+    def items() -> Iterator[tuple[TK, TV]]: ...
 ```
 
+</v-clicks>
+</Transform>
+
+
+
+---
+
+# Sometimes Types Imply Shape or Ordering
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+We might ask more from our types
+
+`list[str]`: unbound in size
+
+`Interator[str | bool]`: unordered component types
+
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# The Power of `tuple`
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+As an immutable sequence, use `tuple` differently
+
+`tuple[str, float, float, bool]`: ordered types of size four
+
+`tuple[str, ...]`: 0 or more `str`
+
+
+</v-clicks>
+</Transform>
+
+
+
+---
+
+# The Power of `tuple`
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+* `tuple` since Python 3.5
+    1. Orderings of a component types
+    2. Unbound sequences of a single type
+* What if you need both?
+* A `tuple` that starts with an `int` and a `str` and follows with zero or more `float`
+* A dataset of identifiers followed by variable observations
+* A `Record` type that can be flexible & elastic
+
+</v-clicks>
+</Transform>
+
+
+
+
+---
+
+# `TypeVarTuple` and `Unpack`
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+* `TypeVarTuple` & `Unpack` since Python 3.11
+* `Unpack` is a generic alias or a new syntax
+* `class Record[*Ts]: ...`
+    * `Record[int, str]`
+    * `Record[int, str, float]`
+    * `Record[int, str, *tuple[float, ...]]`
+
+</v-clicks>
+</Transform>
+
+
+
+---
+
+# Understanding Elastic Generics
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+Typing opportunities with `tuple`
+
+Using `Unpack` syntax
+
+Using `TypeVarTuyple` to define generic classes
+
+A compelling application: generic DataFrames
+
+</v-clicks>
+</Transform>
+
+
+---
+layout: center
+---
+# What's in it for me?
+
+
+---
+
+# About Me
+
+<Transform :scale="1.25">
+<v-clicks>
+
+CTO at Research Affiliates
+
+Python programmer since 2000
+
+PhD in music composition, professor of music technology
+
+Python for algorithmic composition, computational musicology
+
+Since 2012, builder of financial systems in Python
+
+Creator of StaticFrame, an alternative DataFrame library
+</v-clicks>
+</Transform>
+
+
+---
+layout: center
+---
+# What's in it for you?
+
+
+
+---
+
+# Type Annotations for the Modern `tuple`
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+`tuple` since 3.11: `class tuple[*Ts]: ....`
+
+Provides great context for testing
 </v-clicks>
 </Transform>
