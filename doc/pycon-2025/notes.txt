@@ -2,8 +2,6 @@
 
 
 
-
-
 # Elastic Generics: Flexible Static Typing with TypeVarTuple and Unpack
 
 
@@ -92,3 +90,11 @@ V. Conclusion: 5 min
     Variadic generic are elastic
     `TypeVarTuple` challenges our notions of static typing
     How such types are expressive and flexible
+
+
+
+
+
+
+
+
