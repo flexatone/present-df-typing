@@ -299,8 +299,12 @@ layout: center
 <Transform :scale="1.5">
 <v-clicks depth="1">
 
-`tuple` since 3.11: `class tuple[*Ts]: ....`
+* `tuple` since 3.11:
+    * `class tuple[*Ts]: ...`
+* Supports all forms
+    * `tuple[int, ...]`
+    * `tuple[int, str, float]`
+    * `tuple[int, str, *tuple[float, ...]]`
 
-Provides great context for testing
 </v-clicks>
 </Transform>
