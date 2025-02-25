@@ -34,9 +34,9 @@ h1 {font-size: 1.5em;}
 
 Since Python 3.5
 
-An optional layer independent of run-time
+An optional layer, independent of run-time
 
-Verrifiable with tools like `mypy` and `pyright`
+Verifiable with tools like `mypy` and `pyright`
 
 </v-clicks>
 </Transform>
@@ -78,7 +78,7 @@ def process(
 <Transform :scale="1.5">
 <v-clicks depth="1">
 
-* Complex types are "generic"
+* Generic types take type parameters
 * Python containers are generic
     * `list[str]`
     * `set[int]`
@@ -157,7 +157,7 @@ class Map[TK, TV]:
 * `list[str]`
     * Unbound in size
     * Might specify size
-* `Interator[str | bool]`
+* `Iterator[str | bool]`
     * Unordered component types
     * Might specify explicit ordering
 
@@ -190,7 +190,7 @@ class Map[TK, TV]:
 
 ---
 
-# The Power of `tuple`
+# Extending `tuple` Flexability
 
 <Transform :scale="1.5">
 <v-clicks depth="1">
@@ -213,7 +213,7 @@ class Map[TK, TV]:
 <Transform :scale="1.5">
 <v-clicks depth="1">
 
-* `TypeVarTuple` & `Unpack` since Python 3.11
+* `TypeVarTuple` & `Unpack` introduced in Python 3.11
 * Define generics tuple-like flexibility
 * `Unpack` is a generic alias or a new syntax
 * Backwards compatibility through `typing-extensions`
@@ -235,7 +235,7 @@ class Record(Generic[Ts]): ...
 
 r1: Record[int, str]
 r2: Record[int, str, float]
-r3: Record[int, str, Unpack[tuple[float, ...]]]
+r3: Record[int, str, Unpack[tuple[float, ...]]] # unpack is a component
 ```
 
 </v-clicks>
@@ -254,7 +254,7 @@ class Record[*Ts]: ...
 
 r1: Record[int, str]
 r2: Record[int, str, float]
-r3: Record[int, str, *tuple[float, ...]]
+r3: Record[int, str, *tuple[float, ...]] # unpack is star expansion
 ```
 
 </v-clicks>
@@ -307,11 +307,6 @@ Creator of StaticFrame, an alternative DataFrame library
 </Transform>
 
 
----
-layout: center
-
----
-# Why you?
 
 
 ---
@@ -330,11 +325,11 @@ layout: center
 <v-clicks depth="1">
 
 * `tuple` typing upgraded in 3.11
-* Essentially equivalent to `class tuple[*Ts]: ...`
-* Supports all forms
     * `tuple[int, ...]`
     * `tuple[int, str, float]`
     * `tuple[int, str, *tuple[float, ...]]`
+* Essentially equivalent to `class Tuple[*Ts]: ...`
+    * Must use `Tuple[*tuple[int, ...]]` instead of `Tuple[int, ...]`
 
 </v-clicks>
 </Transform>
