@@ -34,34 +34,12 @@ h1 {font-size: 1.5em;}
 
 Since Python 3.5
 
-An optional layer of the program
-
-<!-- Independent from run-time -->
+An optional layer independent of run-time
 
 Verrifiable with tools like `mypy` and `pyright`
+
 </v-clicks>
 </Transform>
-
-
-
-
-
----
-
-# Typing in Python
-
-<Transform :scale="1.25">
-
-Since Python 3.5
-
-An optional layer of the program
-
-<!-- Independent from run-time -->
-
-Verrifiable with tools like `mypy` and `pyright`
-
-</Transform>
-
 
 
 ---
@@ -73,7 +51,11 @@ Verrifiable with tools like `mypy` and `pyright`
 Elemental types are simple
 
 ```python
-def process(x: int, y: float, z: bool) -> float: ...
+def process(
+        x: int,
+        y: float,
+        z: bool,
+        ) -> float: ...
 ```
 
 Types that contain other types are complex
@@ -128,11 +110,13 @@ TK = TypeVar('TK')
 TV = TypeVar('TV')
 
 class Map(Generic[TK, TV]):
-    def keys() -> Iterator[TK]: ...
-    def values() -> Iterator[TV]: ...
-    def items() -> Iterator[tuple[TK, TV]]: ...
+    def keys(self) -> Iterator[TK]: ...
+    def values(self) -> Iterator[TV]: ...
+    def items(self) -> Iterator[tuple[TK, TV]]: ...
+    def __getitem__(self, key: TK) -> TV: ...
 
 m1 = Map[str, bool]()
+v: bool = m1[next(iter(m1.keys()))]
 ```
 
 </v-clicks>
@@ -154,6 +138,7 @@ class Map[TK, TV]:
     def keys() -> Iterator[TK]: ...
     def values() -> Iterator[TV]: ...
     def items() -> Iterator[tuple[TK, TV]]: ...
+    def __getitem__(self, key: TK) -> TV: ...
 ```
 
 </v-clicks>
@@ -163,16 +148,18 @@ class Map[TK, TV]:
 
 ---
 
-# Sometimes Types Imply Shape or Ordering
+# Can Types Define Shape or Ordering
 
 <Transform :scale="1.5">
-<v-clicks depth="1">
+<v-clicks depth="2">
 
-We might ask more from our types
-
-`list[str]`: unbound in size
-
-`Interator[str | bool]`: unordered component types
+* We might ask more from our types
+* `list[str]`
+    * Unbound in size
+    * Might specify size
+* `Interator[str | bool]`
+    * Unordered component types
+    * Might specify explicit ordering
 
 
 </v-clicks>
@@ -186,29 +173,29 @@ We might ask more from our types
 <Transform :scale="1.5">
 <v-clicks depth="1">
 
-As an immutable sequence, use `tuple` differently
+* As an immutable sequence, `tuple` is different
+* Can define order and count of types
+    * `tuple[str, float, float, bool]`
+* Can define zero or more of a single type
+    * `tuple[str, ...]`
 
-`tuple[str, float, float, bool]`: ordered types of size four
-
-`tuple[str, ...]`: 0 or more `str`
-
-
-</v-clicks>
-</Transform>
-
-
-
----
-
-# The Power of `tuple`
-
-<Transform :scale="1.5">
-<v-clicks depth="1">
-
-* `tuple` since Python 3.5
+<!-- * `tuple` since Python 3.5
     1. Orderings of a component types
-    2. Unbound sequences of a single type
-* What if you need both?
+    2. Unbound sequences of a single type -->
+
+</v-clicks>
+</Transform>
+
+
+
+---
+
+# The Power of `tuple`
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+* What if you need both ordering and an unbound sequence
 * A `tuple` that starts with an `int` and a `str` and follows with zero or more `float`
 * A dataset of identifiers followed by variable observations
 * A `Record` type that can be flexible & elastic
@@ -227,11 +214,48 @@ As an immutable sequence, use `tuple` differently
 <v-clicks depth="1">
 
 * `TypeVarTuple` & `Unpack` since Python 3.11
+* Define generics tuple-like flexibility
 * `Unpack` is a generic alias or a new syntax
-* `class Record[*Ts]: ...`
-    * `Record[int, str]`
-    * `Record[int, str, float]`
-    * `Record[int, str, *tuple[float, ...]]`
+* Backwards compatibility through `typing-extensions`
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# `TypeVarTuple` and `Unpack` (< 3.12)
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+```python
+Ts = TypeVarTuple('Ts')
+class Record(Generic[Ts]): ...
+
+r1: Record[int, str]
+r2: Record[int, str, float]
+r3: Record[int, str, Unpack[tuple[float, ...]]]
+```
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# `TypeVarTuple` and `Unpack` (>= 3.12)
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+```python
+class Record[*Ts]: ...
+
+r1: Record[int, str]
+r2: Record[int, str, float]
+r3: Record[int, str, *tuple[float, ...]]
+```
 
 </v-clicks>
 </Transform>
@@ -245,9 +269,7 @@ As an immutable sequence, use `tuple` differently
 <Transform :scale="1.5">
 <v-clicks depth="1">
 
-Typing opportunities with `tuple`
-
-Using `Unpack` syntax
+Typing opportunities with `tuple` and `Unpack` syntax
 
 Using `TypeVarTuyple` to define generic classes
 
@@ -260,7 +282,7 @@ A compelling application: generic DataFrames
 ---
 layout: center
 ---
-# What's in it for me?
+# Why me?
 
 
 ---
@@ -287,20 +309,28 @@ Creator of StaticFrame, an alternative DataFrame library
 
 ---
 layout: center
----
-# What's in it for you?
-
-
 
 ---
+# Why you?
 
-# Type Annotations for the Modern `tuple`
+
+---
+layout: center
+
+---
+# Typing opportunities with `tuple`
+
+
+
+---
+
+# Annotating `tuple`
 
 <Transform :scale="1.5">
 <v-clicks depth="1">
 
-* `tuple` since 3.11:
-    * `class tuple[*Ts]: ...`
+* `tuple` typing upgraded in 3.11
+* Essentially equivalent to `class tuple[*Ts]: ...`
 * Supports all forms
     * `tuple[int, ...]`
     * `tuple[int, str, float]`
@@ -308,3 +338,99 @@ layout: center
 
 </v-clicks>
 </Transform>
+
+
+---
+
+# Annotating `tuple`: Sized & Ordered
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+Define size and an ordering of types
+
+```python
+
+```
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# Annotating `tuple`: Unsized
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+Define zero or more of one type
+
+```python
+
+```
+
+</v-clicks>
+</Transform>
+
+
+
+---
+
+# Annotating `tuple`: Sized & Ordered & Unsized
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+Can define only one unsized region
+
+Sized and ordered segments can optionally start or end
+
+```python
+
+```
+
+</v-clicks>
+</Transform>
+
+
+
+
+---
+layout: center
+
+---
+# Define generic classes `TypeVarTuple`
+
+
+
+
+---
+
+# A `Record` class
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+```python
+class Record[*Ts]: ...
+
+r1: Record[int, ...]
+r2: Record[int, str, float]
+r3: Record[int, str, *tuple[float, ...]]
+r4: Record[int, str, *tuple[float, ...], bool]
+```
+
+</v-clicks>
+</Transform>
+
+
+
+
+
+---
+layout: center
+
+---
+# Generic DataFrames
+
