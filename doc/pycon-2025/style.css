@@ -10,11 +10,11 @@ ul {
     width: 91%;
 }
 pre {
-    width: 91%;
+    width: 82%;
 }
 
 :not(pre) > code::before, :not(pre) > code::after {
 	content: "";
 }
 
-ul li {list-style-type: disc;}
+ul li {list-style-type: none;}
