@@ -237,11 +237,9 @@ Could a `Iterator[str | bool]` specify an ordering of types?
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-Typing opportunities with `tuple` and `Unpack` syntax
-
-Using `TypeVarTuyple` to define generic classes
-
-A compelling application: generic DataFrames
+1. Typing opportunities with `tuple` and `Unpack` syntax
+2. Using `TypeVarTuyple` to define generic classes
+3. A compelling application: generic DataFrames
 
 </v-clicks>
 </Transform>
