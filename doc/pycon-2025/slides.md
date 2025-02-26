@@ -10,7 +10,7 @@ title: "Elastic Generics: Flexible Static Typing with TypeVarTuple and Unpack"
 
 ---
 
-# Elastic Generics: Flexible Static Typing with TypeVarTuple and Unpack
+# Elastic Generics: Flexible Static Typing with `TypeVarTuple` & `Unpack`
 
 <br />
 <br />
@@ -19,7 +19,7 @@ title: "Elastic Generics: Flexible Static Typing with TypeVarTuple and Unpack"
 #### CTO, Research Affiliates
 
 <style>
-h1 {font-size: 3em !important; line-height: 1.1 !important;}
+h1 {font-size: 3.3em !important; line-height: 1.3 !important;}
 </style>
 
 <!-- /NOTE: this is tested on slidev 0.50.0, 0.51 did not work! -->
@@ -27,7 +27,7 @@ h1 {font-size: 3em !important; line-height: 1.1 !important;}
 
 ---
 
-# Typing in Python
+# Type Annotations in Python
 
 
 <Transform :scale="1.25">
@@ -36,6 +36,8 @@ h1 {font-size: 3em !important; line-height: 1.1 !important;}
 Since Python 3.5 (PEP 484)
 
 An optional layer, independent of run-time
+
+Improves code quality
 
 Statically verifiable with tools like `mypy` and `pyright`
 
@@ -269,6 +271,8 @@ Python for algorithmic composition, computational musicology
 Since 2012, builder of financial systems in Python
 
 Creator of StaticFrame, an alternative DataFrame library
+
+Long pondered static typing of DataFrames
 </v-clicks>
 </Transform>
 
@@ -600,7 +604,7 @@ Most other DataFrame libraries do no better
 
 ---
 
-# A DataFrame is a Complex Type
+# A DataFrame is a Variadic Type
 
 <Transform :scale="1.25">
 
@@ -608,7 +612,7 @@ Most other DataFrame libraries do no better
     * The type of the index labels
     * The type of the columns labels
     * The types of data in columns
-* Only StaticFrame has implemented a true generic definition
+* StaticFrame has implemented a true generic definition
 * `TypeVarTuple` makes it possible
 
 </Transform>
@@ -627,53 +631,6 @@ class Frame[TIndex, TColumns, *TDtypes]: ...
 </Transform>
 
 
-
----
-
-# Fully Typed DataFrames
-
-<Transform :scale="1.5">
-<v-clicks depth="1">
-
-```python  {1|1-3|1-4|1-5|1-6|1-7|1-8|1-9}
-
-f: sf.Frame[
-    sf.IndexDate,      # index label type
-    sf.Index[np.str_], # column label type
-    np.float64,        # column 1 type
-    np.float64,        # column 2 type
-    np.bool_,          # column 3 type
-    np.str_]           # column 4 type
-```
-
-</v-clicks>
-</Transform>
-
-
-
-
----
-
-# Variadic Typed DataFrames
-
-<Transform :scale="1.5">
-<v-clicks depth="1">
-
-```python {1|1-2|1-3|1-4|1-6}
-f = sf.Frame[
-        sf.Index[np.int64],
-        sf.Index[np.str_],
-        np.bool_,
-        *tuple[np.float64, ...], # zero or more float64 columns
-        ]()
-```
-
-
-</v-clicks>
-</Transform>
-
-
-
 ---
 
 # Complete Type Information
@@ -686,7 +643,7 @@ def process(
         sf.IndexDate,      # type of Frame index labels
         sf.Index[np.str_], # type of Frame column labels
         np.int64,          # type of Frame first column
-        np.int64,          # type of Frame second column
+        *tuple[np.float64, ...], # type of remaining column
         ],
     q: sf.Series[
         sf.IndexYearMonth, # type of Series index labels
@@ -698,8 +655,6 @@ def process(
         ]: ...
 ```
 </Transform>
-
-
 
 
 
