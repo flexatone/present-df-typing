@@ -195,7 +195,7 @@ Could a `Iterator[str | bool]` specify an ordering of types?
 
 ---
 
-# Extending `tuple` Flexability
+# Extending `tuple` Flexibility
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
@@ -220,7 +220,7 @@ Could a `Iterator[str | bool]` specify an ordering of types?
 * `TypeVarTuple` & `Unpack` introduced in Python 3.11 (PEP 646)
     * Define variadic generics with tuple-like flexibility
     * Can be combined with `TypeVar`
-* `Unpack` is a component or a new syntax
+* `Unpack` is a component and a new syntax
     * `Unpack[tuple[int, ...]]` equivalent to `*tuple[int, ...]`
     * Backwards compatibility through `typing-extensions`
 
@@ -280,7 +280,6 @@ Creator of StaticFrame, an alternative DataFrame library
 
 ---
 layout: center
-
 ---
 # Typing opportunities with `tuple`
 
@@ -292,11 +291,13 @@ layout: center
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-* `tuple` typing upgraded in 3.11
-    * Previously: `tuple[int, ...]` and `tuple[int, str, float]`
-    * Support Unpack syntax: `tuple[int, str, *tuple[float, ...]]`
-* `tuple` is nearly `class Tuple[*Ts]: ...`
-    * Must use `Tuple[*tuple[int, ...]]` instead of `Tuple[int, ...]`
+* `tuple` has extended typing since 3.11
+* Previously: `tuple[int, ...]` and `tuple[int, str, float]`
+* Support Unpack syntax: `tuple[int, str, *tuple[float, ...]]`
+
+<!-- * `class Tuple[*Ts]: ...` is nearly the same as `tuple`
+    * Cannot use: `Tuple[int, ...]`
+    * Equivalent alternative: `Tuple[*tuple[int, ...]]` -->
 
 </v-clicks>
 </Transform>
@@ -312,9 +313,14 @@ layout: center
 Define size and an ordering of types
 
 ```python
+def process(arg: tuple[int, str, float]): ...
 
+process((3, 'x', 4.2)) # mypy passes
+
+process((3, 'x', 4.2, 5.2)) # mypy fails: error:
+    # Argument 1 to "process" has incompatible type
+    # "tuple[int, str, float, float]"; expected "tuple[int, str, float]"
 ```
-
 </v-clicks>
 </Transform>
 
@@ -329,9 +335,16 @@ Define size and an ordering of types
 Define zero or more of one type
 
 ```python
+def process(arg: tuple[float, ...]): ...
 
+process((4.2, 5.8)) # mypy passes
+process(()) # mypy passes
+process((4.2, 5.8, 7.2)) # mypy passes
+
+process((4.2, 5.8, 7.2, 'y')) # mypy fails: error:
+    # Argument 1 to "process" has incompatible type
+    # "tuple[float, float, float, str]"; expected "tuple[float, ...]"
 ```
-
 </v-clicks>
 </Transform>
 
@@ -344,12 +357,47 @@ Define zero or more of one type
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-Can define only one unsized region
+Can define only one unsized `Unpack` region
 
-Sized and ordered segments can optionally start or end
+Ordered segments can proceed and/or follow `Unpack` region
 
 ```python
+def process(arg: tuple[int, str, *tuple[float, ...]]): ...
 
+process((3, 'x', 4.2)) # mypy passes
+process((3, 'x')) # mypy passes
+process((3, 'x', 4.2, 5.8, 7.2)) # mypy passes
+
+process((3, 'x', 4.2, 5.8, 7.2, None)) # mypy fails: error:
+    # Argument 1 to "process" has incompatible type
+    # "tuple[int, str, float, float, float, None]";
+    # expected "tuple[int, str, *tuple[float, ...]]"
+```
+
+</v-clicks>
+</Transform>
+
+
+
+---
+
+# Annotating `tuple`: Sized & Ordered & Unsized & Sized & Ordered
+
+<Transform :scale="1.25">
+<v-clicks depth="1">
+
+Ordered segments can proceed and/or follow `Unpack` region
+
+```python
+def process(arg: tuple[int, *tuple[float, ...], str, bool]): ...
+
+process((3, 4.2, 5.8, 'x', False)) # mypy passes
+process((3, 'y', True)) # mypy passes
+
+process((3, 'x', 4.2, 5.8, 'y', 7.2, 'x', False)) # mypy fails: error:
+    # Argument 1 to "process" has incompatible type
+    # "tuple[int, str, float, float, str, float, str, bool]";
+    # expected "tuple[int, *tuple[float, ...], str, bool]"
 ```
 
 </v-clicks>
@@ -360,22 +408,32 @@ Sized and ordered segments can optionally start or end
 
 
 
-
-
 ---
 layout: center
 
 ---
+
 # Define generic classes `TypeVarTuple`
-
-
-
-<!-- Need to show usage with other type vars, call it `LabelledRecord` -->
 
 
 ---
 
-# `TypeVarTuple` and `Unpack` (< 3.12)
+# Define generic classes `TypeVarTuple`
+
+<Transform :scale="1.25">
+<v-clicks depth="1">
+
+For generics, one (and only one) type variable can be a `TypeVarTuple`
+
+Normal type variables can proceed and/or follow a `TypeVarTuple`
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# Generic Classes with `TypeVarTuple` and `Unpack` (< 3.12)
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
@@ -385,17 +443,15 @@ Ts = TypeVarTuple('Ts')
 class Record(Generic[Ts]): ...
 
 r1: Record[int, str]
-r2: Record[int, str, float]
-r3: Record[int, str, Unpack[tuple[float, ...]]] # unpack is a component
+r2: Record[int, str, Unpack[tuple[float, ...]]] # unpack is a component
 ```
-
 </v-clicks>
 </Transform>
 
 
 ---
 
-# `TypeVarTuple` and `Unpack` (>= 3.12)
+# Generic Classes with `TypeVarTuple` and `Unpack` (>= 3.12)
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
@@ -404,18 +460,113 @@ r3: Record[int, str, Unpack[tuple[float, ...]]] # unpack is a component
 class Record[*Ts]: ...
 
 r1: Record[int, str]
-r2: Record[int, str, float]
-r3: Record[int, str, *tuple[float, ...]] # unpack is star expansion
+r2: Record[int, str, *tuple[float, ...]] # unpack is star expansion
 ```
-
 </v-clicks>
 </Transform>
 
 
+---
+
+# 1. Annotating `Record`
+
+<Transform :scale="1.25">
+<v-clicks depth="1.25">
+
+```python
+class Record[*Ts]:
+    def __init__(self, arg: tuple[*Ts]):
+        self._store = arg
+
+def process(arg: Record[int, str, float]): ...
+
+process(Record((3, 'x', 4.2))) # mypy passes
+process(Record((3, 'x', 4.2, 5.2))) # mypy fails: error:
+    # Argument 1 to "Record" has incompatible type
+    # "tuple[int, str, float, float]"; expected "tuple[int, str, float]"
+```
+</v-clicks>
+</Transform>
 
 
+---
+
+# 2. Annotating `Record`
+
+<Transform :scale="1.25">
+<v-clicks depth="1.25">
+
+```python
+class Record[*Ts]:
+    def __init__(self, arg: tuple[*Ts]):
+        self._store = arg
+
+def process(arg: Record[*tuple[float, ...]]): ...
+
+process(Record((4.2, 5.2))) # mypy passes
+process(Record(())) # mypy passes
+
+process(Record((4.2, 5.2, 'x'))) # mypy fails: error:
+    # Argument 1 to "Record" has incompatible type
+    # "tuple[float, float, str]"; expected "tuple[float, ...]"
+```
+</v-clicks>
+</Transform>
 
 
+---
+
+# 3. Annotating `Record`
+
+<Transform :scale="1.25">
+<v-clicks depth="1.25">
+
+```python
+class Record[*Ts]:
+    def __init__(self, arg: tuple[*Ts]):
+        self._store = arg
+
+def process(arg: Record[int, *tuple[float, ...], str]): ...
+
+process(Record((3, 4.2, 5.2, 'x'))) # mypy passes
+process(Record((3, 'x'))) # mypy passes
+
+process(Record((3, 4.2, 5.2, False))) # mypy fails: error:
+    # Argument 1 to "Record" has incompatible type
+    # "tuple[int, float, float, bool]";
+    # expected "tuple[int, *tuple[float, ...], str]"
+```
+</v-clicks>
+</Transform>
+
+
+---
+
+# Annotating `TaggedRecord`
+
+<Transform :scale="1.25">
+<v-clicks depth="1.25">
+
+```python
+class TaggedRecord[T, *Ts]:
+    def __init__(self, tag: T, values: tuple[*Ts]):
+        self._tag = tag
+        self._values = values
+
+def process(arg: TaggedRecord[str, str, *tuple[float, ...]]): ...
+
+process(TaggedRecord('foo', ('x', 4.2, 5.2))) # mypy passes
+
+process(TaggedRecord(3, ('x', 4.2, 5.2))) # mypy fails: error:
+    # Argument 1 to "TaggedRecord" has incompatible type "int";
+    # expected "str"
+process(TaggedRecord('foo', (4.2, 5.2, 'x'))) # mypy fails: error:
+    # Argument 2 to "TaggedRecord" has incompatible type
+    # "tuple[float, float, str]";
+    # expected "tuple[str, *tuple[float, ...]]"
+```
+</v-clicks>
+</Transform>
 
 
 
@@ -423,33 +574,18 @@ r3: Record[int, str, *tuple[float, ...]] # unpack is star expansion
 layout: center
 
 ---
+
 # Generic DataFrames
 
 
 
 ---
 
-# A Complex Type with Many Component Types
+# Insufficient Type Specification
 
 <Transform :scale="1.25">
 
-* A DataFrame has many components types
-    * The type of the index
-    * The type of the columns
-    * The types of data in columns
-
-
-</Transform>
-
-
-
-
-
----
-
-# Insufficient Type Depth
-
-<Transform :scale="1.25">
+Common typing with Pandas DataFrames is insufficient
 
 ```python
 import pandas as pd
@@ -457,8 +593,38 @@ import pandas as pd
 def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 ```
 
+Most other DataFrame libraries do no better
+
 </Transform>
 
+
+---
+
+# A DataFrame is a Complex Type
+
+<Transform :scale="1.25">
+
+* A DataFrame is generic to many variables
+    * The type of the index labels
+    * The type of the columns labels
+    * The types of data in columns
+* Only StaticFrame has implemented a true generic definition
+* `TypeVarTuple` makes it possible
+
+</Transform>
+
+---
+
+# A Generic DataFrame
+
+<Transform :scale="1.5">
+<v-clicks depth="1">
+
+```python
+class Frame[TIndex, TColumns, *TDtypes]: ...
+```
+</v-clicks>
+</Transform>
 
 
 
@@ -470,15 +636,14 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 <v-clicks depth="1">
 
 ```python  {1|1-3|1-4|1-5|1-6|1-7|1-8|1-9}
->>> class Frame[TIndex, TColumns, *TDtypes]: ...
 
->>> f: sf.Frame[
-        sf.IndexDate,      # index label type
-        sf.Index[np.str_], # column label type
-        np.float64,        # column 1 type
-        np.float64,        # column 2 type
-        np.bool_,          # column 3 type
-        np.str_]           # column 4 type
+f: sf.Frame[
+    sf.IndexDate,      # index label type
+    sf.Index[np.str_], # column label type
+    np.float64,        # column 1 type
+    np.float64,        # column 2 type
+    np.bool_,          # column 3 type
+    np.str_]           # column 4 type
 ```
 
 </v-clicks>
@@ -495,7 +660,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 <v-clicks depth="1">
 
 ```python {1|1-2|1-3|1-4|1-6}
->>> f = sf.Frame[
+f = sf.Frame[
         sf.Index[np.int64],
         sf.Index[np.str_],
         np.bool_,
@@ -541,6 +706,23 @@ def process(
 
 
 
+---
+
+# Elastic Generics
+
+<Transform :scale="1.25">
+
+`TypeVarTuple` permits variadic generics
+
+Elastic types are common
+
+DataFrames are an excellent application
+</Transform>
+
+
+
+
+
 
 ---
 
@@ -549,6 +731,7 @@ def process(
 <Transform :scale="1.25">
 
 StaticFrame: https://static-frame.dev
+
 fetter: https://fetter.io
 </Transform>
 
