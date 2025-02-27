@@ -114,3 +114,23 @@
 #     # Argument 2 to "TaggedRecord" has incompatible type
 #     # "tuple[float, float, str]";
 #     # expected "tuple[str, *tuple[float, ...]]"
+
+
+import static_frame as sf
+import numpy as np
+
+def process(
+    v: sf.Frame[
+        sf.IndexDate,            # type of Frame index labels
+        sf.Index[np.str_],       # type of Frame column labels
+        np.int64,                # type of Frame first column
+        *tuple[np.float64, ...], # type of remaining columns
+        ],
+    ) -> sf.Series[
+        sf.IndexDate,      # type of Series in0dex labels
+        np.float64,        # type of Series values
+        ]: ...
+
+f1: sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.float64] = sf.Frame.from_fields(([20, 30], [1.2, 5.4]), index=sf.IndexDate(('2025-01-03', '2025-02-04')), columns=sf.Index(('a', 'b')))
+
+process(f1)

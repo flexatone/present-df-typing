@@ -609,7 +609,7 @@ Most other DataFrame libraries do no better
 * A DataFrame is generic to many variables
     * The type of the index labels
     * The type of the columns labels
-    * The types of data in columns
+    * The variadic types of data in columns
 * StaticFrame has implemented a true generic definition
 * `TypeVarTuple` makes it possible
 
@@ -635,19 +635,18 @@ class Frame[TIndex, TColumns, *TDtypes]: ...
 
 <Transform :scale="1.25">
 
-```python {all|1|2-2|2-3|2-4|2-5|2-7|8|8-9|8-11|12|12-13|12-14|all}
+```python
+import static_frame as sf
+import numpy as np
+
 def process(
     v: sf.Frame[
-        sf.IndexDate,      # type of Frame index labels
-        sf.Index[np.str_], # type of Frame column labels
-        np.int64,          # type of Frame first column
-        *tuple[np.float64, ...], # type of remaining column
+        sf.IndexDate,            # type of Frame index labels
+        sf.Index[np.str_],       # type of Frame column labels
+        np.int64,                # type of Frame first column
+        *tuple[np.float64, ...], # type of remaining columns
         ],
-    q: sf.Series[
-        sf.IndexYearMonth, # type of Series index labels
-        np.bool_,          # type of Series values
-        ],
-    ) -> Series[
+    ) -> sf.Series[
         sf.IndexDate,      # type of Series in0dex labels
         np.float64,        # type of Series values
         ]: ...
