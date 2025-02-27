@@ -101,6 +101,8 @@ layout: quote
 
 # Most built-in generic containers define unsized, homogeneously typed values
 
+<!-- While a list can hold any type, have to define it as having a single type (which might be a union type) -->
+
 
 ---
 layout: center
@@ -168,7 +170,9 @@ layout: quote
 # Can a generic type define shape or order?
 
 
-
+<!--
+Examples we have seen are of a homogenously typed collections
+ -->
 
 ---
 
@@ -226,19 +230,50 @@ A dataset of identifiers followed by observations
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-* `TypeVarTuple` & `Unpack` introduced in Python 3.11 (PEP 646)
-* Backwards compatibility through `typing-extensions`
-* `TypeVarTuple`
-    * A placeholder in the type parameter list
-    * Supports `tuple`-like flexibility
-    * Can be combined with one or more `TypeVar`
-* `Unpack` is a component and a new syntax
-    * Leverages the unsized sequence notation of `tuple`
-    * Python < 3.11: `Unpack[tuple[int, ...]]`
-    * Python >= 3.11: `*tuple[int, ...]`
+`TypeVarTuple` & `Unpack` introduced in Python 3.11 (PEP 646)
+
+Backwards compatibility through `typing-extensions`
 
 </v-clicks>
 </Transform>
+
+---
+
+# `TypeVarTuple`
+
+<Transform :scale="1.25">
+<v-clicks depth="2">
+
+A placeholder in the type parameter list
+
+Variadic: consumes zero or more types
+
+Supports `tuple`-like flexibility
+
+Can be combined with one or more `TypeVar`
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# `Unpack`
+
+<Transform :scale="1.25">
+<v-clicks depth="2">
+
+* Both a component and a new syntax
+* Leverages the unsized sequence notation of `tuple`
+* Python < 3.11: `Unpack[tuple[int, ...]]`
+* Python >= 3.11: `*tuple[int, ...]`
+* The `*` matters:
+    * `('a', 5, 3, 8, 11): tuple[str, *tuple[int, ..]]`
+    * `('a', (5, 3)): tuple[str, tuple[int, ..]]`
+</v-clicks>
+</Transform>
+
+
 
 
 ---
@@ -346,12 +381,11 @@ process((3, 'x', 4.2, 5.2)) # mypy fails: error:
 
 Define zero or more of one type
 
-```python {1|1-3|1-4|1-5|all}
+```python {1|1-3|1-4|all}
 def process(arg: tuple[float, ...]): ...
 
 process((4.2, 5.8)) # mypy passes
 process(()) # mypy passes
-process((4.2, 5.8, 7.2)) # mypy passes
 
 process((4.2, 5.8, 7.2, 'y')) # mypy fails: error:
     # Argument 1 to "process" has incompatible type
@@ -608,7 +642,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
     * The index label types
     * The columns label types
     * The variadic types of columnar data
-* Idiomatic DataFrame usage
+* Idiomatic DataFrame usage is diverse
     * Fixed column size and type
     * Flexible size with optional columns
 
@@ -623,7 +657,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-StaticFrame 2.0 introduced a complete generic DataFrame
+StaticFrame 2.0: a complete generic DataFrame
 
 Leverages `TypeVarTuple`
 
@@ -677,28 +711,6 @@ def process(
 
 <Transform :scale="1.25">
 
-```python {1|1-2|1-3|4|1-9|1-11}
-f1: sf.Frame[
-    sf.IndexDate,
-    sf.Index[np.str_],
-    np.int64, np.float64, # first column is int, remaining are float
-    ] = sf.Frame.from_fields(
-        ([20, 30], [1.2, 5.4]),
-        index=sf.IndexDate(('2025-01-03', '2025-02-04')),
-        columns=sf.Index(('a', 'b')),
-        )
-
-process(f1) # mypy passes
-```
-</Transform>
-
-
----
-
-# 2. Type Checking a DataFrame
-
-<Transform :scale="1.25">
-
 ```python {1-3|4|1-9|1-11}
 f2: sf.Frame[
     sf.IndexDate,
@@ -717,7 +729,7 @@ process(f2) # mypy passes
 
 ---
 
-# 3. Type Checking DataFrames
+# 2. Type Checking DataFrames
 
 <Transform :scale="1.25">
 
@@ -751,7 +763,7 @@ process(f3) # mypy fails: error:
 
 Static typing can be elastic
 
-`TypeVarTuple` permits flexible and expressive types
+`TypeVarTuple` permits flexible generic types
 
 Unlocks idiomatic DataFrame typing
 
