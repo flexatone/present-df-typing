@@ -22,7 +22,7 @@ title: "Elastic Generics: Flexible Static Typing with TypeVarTuple and Unpack"
 h1 {font-size: 3.5em !important; line-height: 1.3 !important;}
 </style>
 
-<!-- /NOTE: this is tested on slidev 0.50.0, 0.51 did not work! -->
+<!-- NOTE: this is tested on slidev 0.50, 0.51 did not work! -->
 
 
 ---
@@ -59,7 +59,7 @@ def process(
         x: int,
         y: float,
         z: bool,
-        ) -> float: ...
+        ): ...
 ```
 
 Types that are defined with other types are generic
@@ -67,9 +67,9 @@ Types that are defined with other types are generic
 ```python
 def process(
         x: Sequence[int],
-        y: tuple[tuple[str, float], ...],
+        y: frozenset[str],
         z: dict[str, bool],
-        ) -> Iterator[float]: ...
+        ): ...
 ```
 
 </v-clicks>
@@ -83,12 +83,11 @@ def process(
 <v-clicks depth="1">
 
 * Generic types are made concrete with type parameters
-* Can require one or more positional parameters
+* Generics require one or more positional parameters
 * Python containers are generic
     * `list[str]`
     * `set[int]`
 * Python abstract base classes are generic
-    * `Sequence[float]`
     * `Iterator[float]`
     * `Mapping[str, bool]`
 
@@ -102,9 +101,17 @@ layout: quote
 
 # Most built-in generic containers define unsized, homogeneously typed values
 
+
+---
+layout: center
 ---
 
-# Defining Generics in Python (< 3.12)
+# Defining new Generic Types
+
+
+---
+
+# Defining Generic Types in Python (< 3.12)
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
@@ -113,7 +120,7 @@ Subclass from `Generic`
 
 Provide `TypeVar` to `Generic` to specify type variables
 
-```python {1-2|1-4|1-5|1-6|1-7|1-8|all}
+```python {1-2|1-4|1-5|1-6|1-7|all}
 TK = TypeVar('TK')
 TV = TypeVar('TV')
 
@@ -123,8 +130,6 @@ class Map(Generic[TK, TV]):
     def items(self) -> Iterator[tuple[TK, TV]]: ...
     def __getitem__(self, key: TK) -> TV: ...
 
-m1 = Map[str, bool]()
-v: bool = m1[next(iter(m1.keys()))]
 ```
 
 </v-clicks>
@@ -135,7 +140,7 @@ v: bool = m1[next(iter(m1.keys()))]
 
 ---
 
-# Defining Generics in Python (>= 3.12)
+# Defining Generic Types in Python (>= 3.12)
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
@@ -160,7 +165,7 @@ No longer need to subclass `Generic`
 ---
 layout: quote
 ---
-# Can a generic component define shape or order?
+# Can a generic type define shape or order?
 
 
 
@@ -206,7 +211,7 @@ Could an `Iterator[str | bool]` specify an ordering?
 
 What if you need both ordering and an unbound sequence?
 
-A `tuple` that starts with an `int` and a `str` and follows with zero or more `float`
+`int` and `str` followed by zero or more `float`
 
 A dataset of identifiers followed by observations
 
@@ -228,8 +233,9 @@ A dataset of identifiers followed by observations
     * Supports `tuple`-like flexibility
     * Can be combined with one or more `TypeVar`
 * `Unpack` is a component and a new syntax
-    * A way of reusing the unsized sequence notation of `tuple`
-    * `Unpack[tuple[int, ...]]` equivalent to `*tuple[int, ...]`
+    * Leverages the unsized sequence notation of `tuple`
+    * Python < 3.11: `Unpack[tuple[int, ...]]`
+    * Python >= 3.11: `*tuple[int, ...]`
 
 </v-clicks>
 </Transform>
@@ -430,6 +436,8 @@ Now that we have seen the flexability of the generic tuple, we can see how TypeV
 
 One (and only one) type variable can be a `TypeVarTuple`
 
+A placeholder for ordered types and/or an `Unpack` expression
+
 Normal `TypeVar` can proceed and/or follow a `TypeVarTuple`
 
 </v-clicks>
@@ -537,7 +545,7 @@ process(Record((3, 4.2, 5.2, False))) # mypy fails: error:
 
 ---
 
-# Concretizing `TaggedRecord`
+# Combining `TypeVar` and `TypeVarTuple`
 
 <Transform :scale="1.25">
 
@@ -591,18 +599,18 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 
 ---
 
-# A DataFrame is a Variadic Type
+# A DataFrame is Generic
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
 * A DataFrame type is generic to many variables
-    * The index labels
-    * The columns labels
+    * The index label types
+    * The columns label types
     * The variadic types of columnar data
-* Options in making concrete
+* Idiomatic DataFrame usage
     * Fixed column size and type
-    * Flexible size or type regions
+    * Flexible size with optional columns
 
 </v-clicks>
 </Transform>
@@ -669,7 +677,7 @@ def process(
 
 <Transform :scale="1.25">
 
-```python {1-4|1-9|1-11}
+```python {1|1-2|1-3|4|1-9|1-11}
 f1: sf.Frame[
     sf.IndexDate,
     sf.Index[np.str_],
@@ -691,13 +699,13 @@ process(f1) # mypy passes
 
 <Transform :scale="1.25">
 
-```python {1-4|1-9|1-11}
+```python {1-3|4|1-9|1-11}
 f2: sf.Frame[
     sf.IndexDate,
     sf.Index[np.str_],
-    np.int64, np.float64, np.float64, # first column is int, remaining are float
+    np.int64, np.float64, np.float64, np.float64, # first column is int, remaining are float
     ] = sf.Frame.from_fields(
-        ([20, 30], [1.2, 5.4], [8.1, 3.2]),
+        ([20, 30], [1.2, 5.4], [8.1, 3.2], [3.1, 7.9]),
         index=sf.IndexDate(('2025-01-03', '2025-02-04')),
         columns=sf.Index(('a', 'b', 'c')),
         )
@@ -713,7 +721,7 @@ process(f2) # mypy passes
 
 <Transform :scale="1.25">
 
-```python {1-4|1-9|11-15}
+```python {1-3|4|1-9|11-15}
 f3: sf.Frame[
     sf.IndexDate,
     sf.Index[np.str_],
