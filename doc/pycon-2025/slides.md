@@ -19,7 +19,7 @@ title: "Elastic Generics: Flexible Static Typing with TypeVarTuple and Unpack"
 #### CTO, Research Affiliates
 
 <style>
-h1 {font-size: 3.3em !important; line-height: 1.3 !important;}
+h1 {font-size: 3.5em !important; line-height: 1.3 !important;}
 </style>
 
 <!-- /NOTE: this is tested on slidev 0.50.0, 0.51 did not work! -->
