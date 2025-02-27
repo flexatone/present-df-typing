@@ -33,15 +33,15 @@ h1 {font-size: 3.5em !important; line-height: 1.3 !important;}
 <Transform :scale="1.25">
 <v-clicks>
 
-Since Python 3.5 (PEP 484)
+Available since Python 3.5 (PEP 484)
 
 An optional layer, independent of run-time
 
-Improves code quality
+Improves code quality and maintainability
 
 Statically verifiable with tools like `mypy` and `pyright`
 
-Numerous tools for run-time usage
+Numerous tools for run-time validation
 
 </v-clicks>
 </Transform>
@@ -62,7 +62,7 @@ def process(
         ) -> float: ...
 ```
 
-Types that contain other types are generic
+Types that are defined with other types are generic
 
 ```python
 def process(
@@ -92,12 +92,15 @@ def process(
     * `Iterator[float]`
     * `Mapping[str, bool]`
 
-
 </v-clicks>
 </Transform>
 
 
+---
+layout: quote
+---
 
+# Most built-in generic containers define unsized, homogeneously typed values
 
 ---
 
@@ -155,7 +158,7 @@ No longer need to subclass `Generic`
 
 
 ---
-layout: center
+layout: quote
 ---
 # Can a generic component define shape or order?
 
@@ -171,7 +174,7 @@ layout: center
 
 Could a `list[str]` specify a size?
 
-Could an `Iterator[str | bool]` specify an ordering of types?
+Could an `Iterator[str | bool]` specify an ordering?
 
 </v-clicks>
 </Transform>
@@ -187,13 +190,11 @@ Could an `Iterator[str | bool]` specify an ordering of types?
 * A `tuple` can do more
 * A sequence with defined size and ordering of types
     * `tuple[str, float, float, bool]`
-* An un-sized sequence of homogenous types
+* An unsized sequence of homogenous types
     * `tuple[str, ...]`
-
 
 </v-clicks>
 </Transform>
-
 
 
 ---
@@ -213,8 +214,6 @@ A dataset of identifiers followed by observations
 </Transform>
 
 
-
-
 ---
 
 # `TypeVarTuple` and `Unpack`
@@ -225,11 +224,11 @@ A dataset of identifiers followed by observations
 * `TypeVarTuple` & `Unpack` introduced in Python 3.11 (PEP 646)
 * Backwards compatibility through `typing-extensions`
 * `TypeVarTuple`
-    * A place holder in the type parameter list
+    * A placeholder in the type parameter list
     * Supports `tuple`-like flexibility
     * Can be combined with one or more `TypeVar`
 * `Unpack` is a component and a new syntax
-    * A way of reusing the un-sized sequence notation of `tuple`
+    * A way of reusing the unsized sequence notation of `tuple`
     * `Unpack[tuple[int, ...]]` equivalent to `*tuple[int, ...]`
 
 </v-clicks>
@@ -288,13 +287,13 @@ layout: center
 ---
 # Typing opportunities with `tuple`
 
-<!-- <style>
-div {background-color: "#333333"}
-</style> -->
+<!--
+By understanding what we can do with tuple we learn what we can do with TypeVarTuple
+ -->
 
 ---
 
-# Annotating `tuple`
+# Concretizing `tuple`
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
@@ -306,14 +305,13 @@ div {background-color: "#333333"}
     * Can use `Unpack` syntax
     * `tuple[int, str, *tuple[float, ...]]`
 
-
 </v-clicks>
 </Transform>
 
 
 ---
 
-# Annotating `tuple`: Sized & Ordered
+# Concretizing `tuple`: Sized & Ordered
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
@@ -335,7 +333,7 @@ process((3, 'x', 4.2, 5.2)) # mypy fails: error:
 
 ---
 
-# Annotating `tuple`: Unsized
+# Concretizing `tuple`: Unsized
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
@@ -360,7 +358,7 @@ process((4.2, 5.8, 7.2, 'y')) # mypy fails: error:
 
 ---
 
-# Annotating `tuple`: Sized & Ordered & Unsized
+# Concretizing `tuple`: Sized & Ordered & Unsized
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
@@ -389,7 +387,7 @@ process((3, 'x', 4.2, 5.8, 7.2, None)) # mypy fails: error:
 
 ---
 
-# Annotating `tuple`: Sized & Ordered & Unsized & Sized & Ordered
+# Concretizing `tuple`: Sized & Ordered & Unsized & Sized & Ordered
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
@@ -412,27 +410,27 @@ process((3, 'x', 4.2, 5.8, 'y', 7.2, 'x', False)) # mypy fails: error:
 </Transform>
 
 
-
-
-
 ---
 layout: center
 
 ---
 
-# Define Generic Classes `TypeVarTuple`
+# Defining Generic Classes with `TypeVarTuple`
 
+<!--
+Now that we have seen the flexability of the generic tuple, we can see how TypeVarTuple lets use have that same flexability with our own classes
+ -->
 
 ---
 
-# Define Generic Classes `TypeVarTuple`
+# Defining Generic Classes with `TypeVarTuple`
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-For generics, one (and only one) type variable can be a `TypeVarTuple`
+One (and only one) type variable can be a `TypeVarTuple`
 
-Normal type variables can proceed and/or follow a `TypeVarTuple`
+Normal `TypeVar` can proceed and/or follow a `TypeVarTuple`
 
 </v-clicks>
 </Transform>
@@ -471,7 +469,7 @@ r2: Record[int, str, *tuple[float, ...]] # unpack is star expansion
 
 ---
 
-# 1. Annotating `Record`
+# 1. Concretizing `Record`
 
 <Transform :scale="1.25">
 
@@ -492,7 +490,7 @@ process(Record((3, 'x', 4.2, 5.2))) # mypy fails: error:
 
 ---
 
-# 2. Annotating `Record`
+# 2. Concretizing `Record`
 
 <Transform :scale="1.25">
 
@@ -515,7 +513,7 @@ process(Record((4.2, 5.2, 'x'))) # mypy fails: error:
 
 ---
 
-# 3. Annotating `Record`
+# 3. Concretizing `Record`
 
 <Transform :scale="1.25">
 
@@ -539,7 +537,7 @@ process(Record((3, 4.2, 5.2, False))) # mypy fails: error:
 
 ---
 
-# Annotating `TaggedRecord`
+# Concretizing `TaggedRecord`
 
 <Transform :scale="1.25">
 
@@ -564,14 +562,12 @@ process(TaggedRecord('foo', (4.2, 5.2, 'x'))) # mypy fails: error:
 </Transform>
 
 
-
 ---
 layout: center
 
 ---
 
 # Generic DataFrames
-
 
 
 ---
@@ -589,7 +585,6 @@ import pandas as pd
 def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 ```
 
-
 </v-clicks>
 </Transform>
 
@@ -601,21 +596,42 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-* A DataFrame is generic to many variables
-    * The type of the index labels
-    * The type of the columns labels
+* A DataFrame type is generic to many variables
+    * The index labels
+    * The columns labels
     * The variadic types of columnar data
-* StaticFrame has implemented a true generic definition
-    * `TypeVarTuple` makes it possible
-    * Statically verifiable with `mypy`
-    * Run-time validation with `@sf.CallGuard.check`
+* Options in making concrete
+    * Fixed column size and type
+    * Flexible size or type regions
 
 </v-clicks>
 </Transform>
 
+
 ---
 
-# A Generic DataFrame
+# A Comprehensively Generic DataFrame
+
+<Transform :scale="1.25">
+<v-clicks depth="2">
+
+StaticFrame 2.0 introduced a complete generic DataFrame
+
+Leverages `TypeVarTuple`
+
+Statically verifiable with `mypy` and `pyright`
+
+Run-time validation with `@sf.CallGuard.check`
+
+Integrated with generic `Series`, `Index`, and `IndexHierarchy`
+
+</v-clicks>
+</Transform>
+
+
+---
+
+# StaticFrame's Generic DataFrame
 
 <Transform :scale="1.5">
 
@@ -627,7 +643,7 @@ class Frame[TIndex, TColumns, *TDtypes]: ...
 
 ---
 
-# Complete DataFrame Typing
+# Concretizing a DataFrame
 
 <Transform :scale="1.25">
 
@@ -636,7 +652,7 @@ import static_frame as sf
 import numpy as np
 
 def process(
-    v: sf.Frame[
+    arg: sf.Frame[
         sf.IndexDate,            # type of Frame index labels
         sf.Index[np.str_],       # type of Frame column labels
         np.int64,                # type of Frame first column
@@ -647,10 +663,9 @@ def process(
 </Transform>
 
 
-
 ---
 
-# Type Checking DataFrames
+# 1. Type Checking a DataFrame
 
 <Transform :scale="1.25">
 
@@ -670,10 +685,9 @@ process(f1) # mypy passes
 </Transform>
 
 
-
 ---
 
-# Type Checking DataFrames
+# 2. Type Checking a DataFrame
 
 <Transform :scale="1.25">
 
@@ -693,11 +707,9 @@ process(f2) # mypy passes
 </Transform>
 
 
-
-
 ---
 
-# Type Checking DataFrames
+# 3. Type Checking DataFrames
 
 <Transform :scale="1.25">
 
@@ -729,11 +741,11 @@ process(f3) # mypy fails: error:
 <Transform :scale="1.25">
 <v-clicks>
 
-`TypeVarTuple` permits variadic generics
+Static typing can be elastic
 
-Permits flexible and expressive types
+`TypeVarTuple` permits flexible and expressive types
 
-DataFrames are an excellent application
+Unlocks idiomatic DataFrame typing
 
 </v-clicks>
 </Transform>
