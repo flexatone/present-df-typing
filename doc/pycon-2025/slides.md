@@ -48,11 +48,11 @@ Numerous tools for run-time usage
 
 ---
 
-# Simple & Complex Types
+# Elemental & Generic Types
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-Elemental types are simple
+Elemental types
 
 ```python
 def process(
@@ -62,7 +62,7 @@ def process(
         ) -> float: ...
 ```
 
-Types that contain other types are complex
+Types that contain other types are generic
 
 ```python
 def process(
@@ -277,9 +277,6 @@ Long pondered static typing of DataFrames
 
 
 
-
-
-
 ---
 layout: center
 ---
@@ -293,13 +290,9 @@ layout: center
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-* `tuple` has extended typing since 3.11
-* Previously: `tuple[int, ...]` and `tuple[int, str, float]`
-* Support Unpack syntax: `tuple[int, str, *tuple[float, ...]]`
+* Since 3.5: `tuple[int, ...]` and `tuple[int, str, float]`
+* Since 3.11: Unpack syntax: `tuple[int, str, *tuple[float, ...]]`
 
-<!-- * `class Tuple[*Ts]: ...` is nearly the same as `tuple`
-    * Cannot use: `Tuple[int, ...]`
-    * Equivalent alternative: `Tuple[*tuple[int, ...]]` -->
 
 </v-clicks>
 </Transform>
@@ -409,7 +402,6 @@ process((3, 'x', 4.2, 5.8, 'y', 7.2, 'x', False)) # mypy fails: error:
 
 
 
-
 ---
 layout: center
 
@@ -438,7 +430,6 @@ Normal type variables can proceed and/or follow a `TypeVarTuple`
 # Generic Classes with `TypeVarTuple` and `Unpack` (< 3.12)
 
 <Transform :scale="1.25">
-<v-clicks depth="1">
 
 ```python
 Ts = TypeVarTuple('Ts')
@@ -447,7 +438,6 @@ class Record(Generic[Ts]): ...
 r1: Record[int, str]
 r2: Record[int, str, Unpack[tuple[float, ...]]] # unpack is a component
 ```
-</v-clicks>
 </Transform>
 
 
@@ -456,7 +446,6 @@ r2: Record[int, str, Unpack[tuple[float, ...]]] # unpack is a component
 # Generic Classes with `TypeVarTuple` and `Unpack` (>= 3.12)
 
 <Transform :scale="1.25">
-<v-clicks depth="1">
 
 ```python
 class Record[*Ts]: ...
@@ -464,7 +453,6 @@ class Record[*Ts]: ...
 r1: Record[int, str]
 r2: Record[int, str, *tuple[float, ...]] # unpack is star expansion
 ```
-</v-clicks>
 </Transform>
 
 
@@ -473,7 +461,6 @@ r2: Record[int, str, *tuple[float, ...]] # unpack is star expansion
 # 1. Annotating `Record`
 
 <Transform :scale="1.25">
-<v-clicks depth="1.25">
 
 ```python
 class Record[*Ts]:
@@ -487,7 +474,6 @@ process(Record((3, 'x', 4.2, 5.2))) # mypy fails: error:
     # Argument 1 to "Record" has incompatible type
     # "tuple[int, str, float, float]"; expected "tuple[int, str, float]"
 ```
-</v-clicks>
 </Transform>
 
 
@@ -496,7 +482,6 @@ process(Record((3, 'x', 4.2, 5.2))) # mypy fails: error:
 # 2. Annotating `Record`
 
 <Transform :scale="1.25">
-<v-clicks depth="1.25">
 
 ```python
 class Record[*Ts]:
@@ -512,7 +497,6 @@ process(Record((4.2, 5.2, 'x'))) # mypy fails: error:
     # Argument 1 to "Record" has incompatible type
     # "tuple[float, float, str]"; expected "tuple[float, ...]"
 ```
-</v-clicks>
 </Transform>
 
 
@@ -521,7 +505,6 @@ process(Record((4.2, 5.2, 'x'))) # mypy fails: error:
 # 3. Annotating `Record`
 
 <Transform :scale="1.25">
-<v-clicks depth="1.25">
 
 ```python
 class Record[*Ts]:
@@ -538,7 +521,6 @@ process(Record((3, 4.2, 5.2, False))) # mypy fails: error:
     # "tuple[int, float, float, bool]";
     # expected "tuple[int, *tuple[float, ...], str]"
 ```
-</v-clicks>
 </Transform>
 
 
@@ -547,7 +529,6 @@ process(Record((3, 4.2, 5.2, False))) # mypy fails: error:
 # Annotating `TaggedRecord`
 
 <Transform :scale="1.25">
-<v-clicks depth="1">
 
 ```python
 class TaggedRecord[T, *Ts]:
@@ -567,7 +548,6 @@ process(TaggedRecord('foo', (4.2, 5.2, 'x'))) # mypy fails: error:
     # "tuple[float, float, str]";
     # expected "tuple[str, *tuple[float, ...]]"
 ```
-</v-clicks>
 </Transform>
 
 
@@ -586,6 +566,7 @@ layout: center
 # Insufficient Type Specification
 
 <Transform :scale="1.25">
+<v-clicks depth="1">
 
 Common typing with Pandas DataFrames is insufficient
 
@@ -597,6 +578,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 
 Most other DataFrame libraries do no better
 
+</v-clicks>
 </Transform>
 
 
@@ -652,6 +634,77 @@ def process(
 
 
 
+---
+
+# Type Checking DataFrames
+
+<Transform :scale="1.25">
+
+```python
+f1: sf.Frame[
+    sf.IndexDate,
+    sf.Index[np.str_],
+    np.int64, np.float64,
+    ] = sf.Frame.from_fields(
+        ([20, 30], [1.2, 5.4]),
+        index=sf.IndexDate(('2025-01-03', '2025-02-04')),
+        columns=sf.Index(('a', 'b')),
+        )
+
+process(f1) # mypy passes
+```
+</Transform>
+
+
+
+---
+
+# Type Checking DataFrames
+
+<Transform :scale="1.25">
+
+```python
+f2: sf.Frame[
+    sf.IndexDate,
+    sf.Index[np.str_],
+    np.int64, np.float64, np.float64,
+    ] = sf.Frame.from_fields(
+        ([20, 30], [1.2, 5.4], [8.1, 3.2]),
+        index=sf.IndexDate(('2025-01-03', '2025-02-04')),
+        columns=sf.Index(('a', 'b', 'c')),
+        )
+
+process(f2) # mypy passes
+```
+</Transform>
+
+
+
+
+---
+
+# Type Checking DataFrames
+
+<Transform :scale="1.25">
+
+```python
+f3: sf.Frame[
+    sf.IndexDate,
+    sf.Index[np.str_],
+    np.int64, np.float64, np.str_,
+    ] = sf.Frame.from_fields(
+        ([20, 30], [1.2, 5.4], ['x', 'y']),
+        index=sf.IndexDate(('2025-01-03', '2025-02-04')),
+        columns=sf.Index(('a', 'b')),
+        )
+
+process(f3) # mypy fails: error:
+    # Argument 1 to "process" has incompatible type
+    # "Frame[IndexDate, Index[str_], signedinteger[_64Bit], float64, str_]";
+    # expected "Frame[IndexDate, Index[str_], signedinteger[_64Bit], *tuple[float64, ...]]"
+
+```
+</Transform>
 
 
 
@@ -660,28 +713,25 @@ def process(
 # Elastic Generics
 
 <Transform :scale="1.25">
+<v-clicks>
 
 `TypeVarTuple` permits variadic generics
 
 Elastic types are common
 
 DataFrames are an excellent application
-</Transform>
 
+</v-clicks>
+</Transform>
 
 
 
 
 
 ---
+layout: center
 
-# Thank You
+---
 
-<Transform :scale="1.25">
-
-StaticFrame: https://static-frame.dev
-
-fetter: https://fetter.io
-</Transform>
-
+# Thank you
 
