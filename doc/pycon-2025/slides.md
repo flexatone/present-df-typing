@@ -87,7 +87,7 @@ def process(
 * Python containers are generic
     * `list[str]`
     * `set[int]`
-* Python ABC's are generic
+* Python abstract base classes are generic
     * `Sequence[float]`
     * `Iterator[float]`
     * `Mapping[str, bool]`
@@ -110,7 +110,7 @@ Subclass from `Generic`
 
 Provide `TypeVar` to `Generic` to specify type variables
 
-```python
+```python {1-2|1-4|1-5|1-6|1-7|1-8|all}
 TK = TypeVar('TK')
 TV = TypeVar('TV')
 
@@ -137,7 +137,7 @@ v: bool = m1[next(iter(m1.keys()))]
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-```python
+```python {1|all}
 class Map[TK, TV]:
     def keys() -> Iterator[TK]: ...
     def values() -> Iterator[TV]: ...
@@ -171,7 +171,7 @@ layout: center
 
 Could a `list[str]` specify a size?
 
-Could a `Iterator[str | bool]` specify an ordering of types?
+Could an `Iterator[str | bool]` specify an ordering of types?
 
 </v-clicks>
 </Transform>
@@ -184,9 +184,10 @@ Could a `Iterator[str | bool]` specify an ordering of types?
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
+* A `tuple` can do more
 * A sequence with defined size and ordering of types
     * `tuple[str, float, float, bool]`
-* An un sized sequence of homogenous types
+* An un-sized sequence of homogenous types
     * `tuple[str, ...]`
 
 
@@ -202,9 +203,11 @@ Could a `Iterator[str | bool]` specify an ordering of types?
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-* What if you need both ordering and an unbound sequence?
-* A `tuple` that starts with an `int` and a `str` and follows with zero or more `float`
-* A dataset of identifiers followed by variable observations
+What if you need both ordering and an unbound sequence?
+
+A `tuple` that starts with an `int` and a `str` and follows with zero or more `float`
+
+A dataset of identifiers followed by observations
 
 </v-clicks>
 </Transform>
@@ -217,14 +220,17 @@ Could a `Iterator[str | bool]` specify an ordering of types?
 # `TypeVarTuple` and `Unpack`
 
 <Transform :scale="1.25">
-<v-clicks depth="1">
+<v-clicks depth="2">
 
 * `TypeVarTuple` & `Unpack` introduced in Python 3.11 (PEP 646)
-    * Define variadic generics with tuple-like flexibility
-    * Can be combined with `TypeVar`
+* Backwards compatibility through `typing-extensions`
+* `TypeVarTuple`
+    * A place holder in the type parameter list
+    * Supports `tuple`-like flexibility
+    * Can be combined with one or more `TypeVar`
 * `Unpack` is a component and a new syntax
+    * A way of reusing the un-sized sequence notation of `tuple`
     * `Unpack[tuple[int, ...]]` equivalent to `*tuple[int, ...]`
-    * Backwards compatibility through `typing-extensions`
 
 </v-clicks>
 </Transform>
@@ -238,7 +244,7 @@ Could a `Iterator[str | bool]` specify an ordering of types?
 <v-clicks depth="1">
 
 1. Typing opportunities with `tuple` and `Unpack` syntax
-2. Using `TypeVarTuyple` to define generic classes
+2. Using `TypeVarTuple` to define generic classes
 3. A compelling application: generic DataFrames
 
 </v-clicks>
@@ -282,6 +288,9 @@ layout: center
 ---
 # Typing opportunities with `tuple`
 
+<!-- <style>
+div {background-color: "#333333"}
+</style> -->
 
 ---
 
@@ -290,8 +299,12 @@ layout: center
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-* Since 3.5: `tuple[int, ...]` and `tuple[int, str, float]`
-* Since 3.11: Unpack syntax: `tuple[int, str, *tuple[float, ...]]`
+* Since 3.5:
+    * `tuple[int, ...]`
+    * `tuple[int, str, float]`
+* Since 3.11:
+    * Can use `Unpack` syntax
+    * `tuple[int, str, *tuple[float, ...]]`
 
 
 </v-clicks>
@@ -307,7 +320,7 @@ layout: center
 
 Define size and an ordering of types
 
-```python
+```python {1|1-3|all}
 def process(arg: tuple[int, str, float]): ...
 
 process((3, 'x', 4.2)) # mypy passes
@@ -329,7 +342,7 @@ process((3, 'x', 4.2, 5.2)) # mypy fails: error:
 
 Define zero or more of one type
 
-```python
+```python {1|1-3|1-4|1-5|all}
 def process(arg: tuple[float, ...]): ...
 
 process((4.2, 5.8)) # mypy passes
@@ -354,9 +367,9 @@ process((4.2, 5.8, 7.2, 'y')) # mypy fails: error:
 
 Can define only one unsized `Unpack` region
 
-Ordered segments can proceed and/or follow `Unpack` region
+Ordered segments can proceed an `Unpack` region
 
-```python
+```python {1|1-3|1-4|1-5|all}
 def process(arg: tuple[int, str, *tuple[float, ...]]): ...
 
 process((3, 'x', 4.2)) # mypy passes
@@ -381,9 +394,9 @@ process((3, 'x', 4.2, 5.8, 7.2, None)) # mypy fails: error:
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-Ordered segments can proceed and/or follow `Unpack` region
+Ordered segments can proceed and/or follow an `Unpack` region
 
-```python
+```python {1|1-3|1-4|all}
 def process(arg: tuple[int, *tuple[float, ...], str, bool]): ...
 
 process((3, 4.2, 5.8, 'x', False)) # mypy passes
@@ -407,12 +420,12 @@ layout: center
 
 ---
 
-# Define generic classes `TypeVarTuple`
+# Define Generic Classes `TypeVarTuple`
 
 
 ---
 
-# Define generic classes `TypeVarTuple`
+# Define Generic Classes `TypeVarTuple`
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
@@ -431,7 +444,7 @@ Normal type variables can proceed and/or follow a `TypeVarTuple`
 
 <Transform :scale="1.25">
 
-```python
+```python {0|1|1-2|1-4|1-5}
 Ts = TypeVarTuple('Ts')
 class Record(Generic[Ts]): ...
 
@@ -447,7 +460,7 @@ r2: Record[int, str, Unpack[tuple[float, ...]]] # unpack is a component
 
 <Transform :scale="1.25">
 
-```python
+```python {1|1-3|1-4}
 class Record[*Ts]: ...
 
 r1: Record[int, str]
@@ -462,7 +475,7 @@ r2: Record[int, str, *tuple[float, ...]] # unpack is star expansion
 
 <Transform :scale="1.25">
 
-```python
+```python {1|1-3|5|5-7|5-10}
 class Record[*Ts]:
     def __init__(self, arg: tuple[*Ts]):
         self._store = arg
@@ -483,7 +496,7 @@ process(Record((3, 'x', 4.2, 5.2))) # mypy fails: error:
 
 <Transform :scale="1.25">
 
-```python
+```python {1-3|5|5-7|5-8|5-12}
 class Record[*Ts]:
     def __init__(self, arg: tuple[*Ts]):
         self._store = arg
@@ -506,7 +519,7 @@ process(Record((4.2, 5.2, 'x'))) # mypy fails: error:
 
 <Transform :scale="1.25">
 
-```python
+```python {1-3|5|5-7|5-8|5-13}
 class Record[*Ts]:
     def __init__(self, arg: tuple[*Ts]):
         self._store = arg
@@ -530,7 +543,7 @@ process(Record((3, 4.2, 5.2, False))) # mypy fails: error:
 
 <Transform :scale="1.25">
 
-```python
+```python {1|1-4|6|6-8|6-12|6-16}
 class TaggedRecord[T, *Ts]:
     def __init__(self, tag: T, values: tuple[*Ts]):
         self._tag = tag
@@ -576,7 +589,6 @@ import pandas as pd
 def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 ```
 
-Most other DataFrame libraries do no better
 
 </v-clicks>
 </Transform>
@@ -594,7 +606,9 @@ Most other DataFrame libraries do no better
     * The type of the columns labels
     * The variadic types of columnar data
 * StaticFrame has implemented a true generic definition
-* `TypeVarTuple` makes it possible
+    * `TypeVarTuple` makes it possible
+    * Statically verifiable with `mypy`
+    * Run-time validation with `@sf.CallGuard.check`
 
 </v-clicks>
 </Transform>
@@ -617,7 +631,7 @@ class Frame[TIndex, TColumns, *TDtypes]: ...
 
 <Transform :scale="1.25">
 
-```python
+```python {1-4|1-5|1-6|1-7|1-8|1-12}
 import static_frame as sf
 import numpy as np
 
@@ -640,11 +654,11 @@ def process(
 
 <Transform :scale="1.25">
 
-```python
+```python {1-4|1-9|1-11}
 f1: sf.Frame[
     sf.IndexDate,
     sf.Index[np.str_],
-    np.int64, np.float64,
+    np.int64, np.float64, # first column is int, remaining are float
     ] = sf.Frame.from_fields(
         ([20, 30], [1.2, 5.4]),
         index=sf.IndexDate(('2025-01-03', '2025-02-04')),
@@ -663,11 +677,11 @@ process(f1) # mypy passes
 
 <Transform :scale="1.25">
 
-```python
+```python {1-4|1-9|1-11}
 f2: sf.Frame[
     sf.IndexDate,
     sf.Index[np.str_],
-    np.int64, np.float64, np.float64,
+    np.int64, np.float64, np.float64, # first column is int, remaining are float
     ] = sf.Frame.from_fields(
         ([20, 30], [1.2, 5.4], [8.1, 3.2]),
         index=sf.IndexDate(('2025-01-03', '2025-02-04')),
@@ -687,11 +701,11 @@ process(f2) # mypy passes
 
 <Transform :scale="1.25">
 
-```python
+```python {1-4|1-9|11-15}
 f3: sf.Frame[
     sf.IndexDate,
     sf.Index[np.str_],
-    np.int64, np.float64, np.str_,
+    np.int64, np.float64, np.str_, # int, float, and string columns
     ] = sf.Frame.from_fields(
         ([20, 30], [1.2, 5.4], ['x', 'y']),
         index=sf.IndexDate(('2025-01-03', '2025-02-04')),
@@ -717,7 +731,7 @@ process(f3) # mypy fails: error:
 
 `TypeVarTuple` permits variadic generics
 
-Elastic types are common
+Permits flexible and expressive types
 
 DataFrames are an excellent application
 
