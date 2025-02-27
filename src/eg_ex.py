@@ -126,11 +126,16 @@ def process(
         np.int64,                # type of Frame first column
         *tuple[np.float64, ...], # type of remaining columns
         ],
-    ) -> sf.Series[
-        sf.IndexDate,      # type of Series in0dex labels
-        np.float64,        # type of Series values
-        ]: ...
+    ): ...
 
 f1: sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.float64] = sf.Frame.from_fields(([20, 30], [1.2, 5.4]), index=sf.IndexDate(('2025-01-03', '2025-02-04')), columns=sf.Index(('a', 'b')))
 
-process(f1)
+process(f1) # mypy passes
+
+f2: sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.float64, np.float64] = sf.Frame.from_fields(([20, 30], [1.2, 5.4], [8.1, 3.2]), index=sf.IndexDate(('2025-01-03', '2025-02-04')), columns=sf.Index(('a', 'b')))
+
+process(f2) # mypy passes
+
+f3: sf.Frame[sf.IndexDate, sf.Index[np.str_], np.int64, np.float64, np.str_] = sf.Frame.from_fields(([20, 30], [1.2, 5.4], ['x', 'y']), index=sf.IndexDate(('2025-01-03', '2025-02-04')), columns=sf.Index(('a', 'b')))
+
+process(f3) # mypy fails: error: Argument 1 to "process" has incompatible type "Frame[IndexDate, Index[str_], signedinteger[_64Bit], float64, str_]"; expected "Frame[IndexDate, Index[str_], signedinteger[_64Bit], *tuple[float64, ...]]"

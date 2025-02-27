@@ -547,7 +547,7 @@ process(Record((3, 4.2, 5.2, False))) # mypy fails: error:
 # Annotating `TaggedRecord`
 
 <Transform :scale="1.25">
-<v-clicks depth="1.25">
+<v-clicks depth="1">
 
 ```python
 class TaggedRecord[T, *Ts]:
@@ -605,14 +605,16 @@ Most other DataFrame libraries do no better
 # A DataFrame is a Variadic Type
 
 <Transform :scale="1.25">
+<v-clicks depth="2">
 
 * A DataFrame is generic to many variables
     * The type of the index labels
     * The type of the columns labels
-    * The variadic types of data in columns
+    * The variadic types of columnar data
 * StaticFrame has implemented a true generic definition
 * `TypeVarTuple` makes it possible
 
+</v-clicks>
 </Transform>
 
 ---
@@ -620,18 +622,16 @@ Most other DataFrame libraries do no better
 # A Generic DataFrame
 
 <Transform :scale="1.5">
-<v-clicks depth="1">
 
 ```python
 class Frame[TIndex, TColumns, *TDtypes]: ...
 ```
-</v-clicks>
 </Transform>
 
 
 ---
 
-# Complete Type Information
+# Complete DataFrame Typing
 
 <Transform :scale="1.25">
 
@@ -646,10 +646,7 @@ def process(
         np.int64,                # type of Frame first column
         *tuple[np.float64, ...], # type of remaining columns
         ],
-    ) -> sf.Series[
-        sf.IndexDate,      # type of Series in0dex labels
-        np.float64,        # type of Series values
-        ]: ...
+    ): ...
 ```
 </Transform>
 
