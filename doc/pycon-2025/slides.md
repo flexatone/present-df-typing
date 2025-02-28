@@ -22,7 +22,14 @@ title: "Elastic Generics: Flexible Static Typing with TypeVarTuple and Unpack"
 h1 {font-size: 3.5em !important; line-height: 1.3 !important;}
 </style>
 
-<!-- NOTE: this is tested on slidev 0.50, 0.51 did not work! -->
+<!-- NOTE: this is tested on slidev 0.50, 0.51 did not work!
+
+TODO: start with some interesting and compelling examples
+define / replace concretize
+Point out how strange TaggedRecord is
+Pydantic / Panderra: show how these are insufficient
+
+-->
 
 
 ---
