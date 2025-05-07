@@ -32,9 +32,39 @@ Pydantic / Panderra: show how these are insufficient
 -->
 
 
+
 ---
 
-# Type Annotations in Python
+# Elastic Generics
+
+<!--
+If you work with DataFrames, you probably gave up on typing
+What if you could define streatchable types
+-->
+
+<Transform :scale="1.25">
+
+```python {all}
+import static_frame as sf
+import numpy as np
+
+def process(
+    arg: sf.Frame[
+        sf.IndexDate,            # type of Frame index labels
+        sf.Index[np.str_],       # type of Frame column labels
+        np.int64,                # type of Frame first column
+        *tuple[np.float64, ...], # type of remaining columns
+        ],
+    ): ...
+```
+</Transform>
+
+
+
+
+---
+
+# A Decade of Type Annotations in Python
 
 
 <Transform :scale="1.25">
@@ -69,7 +99,7 @@ def process(
         ): ...
 ```
 
-Types that are defined with other types are generic
+Types composed of other types are generic
 
 ```python
 def process(
@@ -106,7 +136,7 @@ def process(
 layout: quote
 ---
 
-# Most built-in generic containers define unsized, homogeneously typed values
+## Most built-in generic containers define unsized, homogeneously typed values
 
 <!-- While a list can hold any type, have to define it as having a single type (which might be a union type) -->
 
@@ -127,7 +157,7 @@ layout: center
 
 Subclass from `Generic`
 
-Provide `TypeVar` to `Generic` to specify type variables
+Provide `TypeVar` arguments to `Generic` to specify type variables
 
 ```python {1-2|1-4|1-5|1-6|1-7|all}
 TK = TypeVar('TK')
@@ -171,10 +201,11 @@ No longer need to subclass `Generic`
 
 
 
+
 ---
 layout: quote
 ---
-# Can a generic type define shape or order?
+## Can a generic define shape or ordering of types?
 
 
 <!--
@@ -190,7 +221,7 @@ Examples we have seen are of a homogenously typed collections
 
 Could a `list[str]` specify a size?
 
-Could an `Iterator[str | bool]` specify an ordering?
+Could an `Iterator[str | bool]` specify an ordering of types?
 
 </v-clicks>
 </Transform>
@@ -237,7 +268,9 @@ A dataset of identifiers followed by observations
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-`TypeVarTuple` & `Unpack` introduced in Python 3.11 (PEP 646)
+Tools for defining and concertizing generics with both ordering and unbound sequences
+
+Introduced in Python 3.11 (PEP 646)
 
 Backwards compatibility through `typing-extensions`
 
@@ -251,7 +284,7 @@ Backwards compatibility through `typing-extensions`
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-A placeholder in the type parameter list
+A "placeholder" in the typevar parameter list
 
 Variadic: consumes zero or more types
 
@@ -270,7 +303,7 @@ Can be combined with one or more `TypeVar`
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-* Both a component and a new syntax
+* Both a component and a new syntax for concretizing `TypeVarTuple`
 * Leverages the unsized sequence notation of `tuple`
 * Python < 3.11: `Unpack[tuple[int, ...]]`
 * Python >= 3.11: `*tuple[int, ...]`
@@ -301,7 +334,13 @@ Can be combined with one or more `TypeVar`
 ---
 layout: center
 ---
-# Why me?
+## Why me?
+
+<!--
+I did not work on the PEP or implementation
+Much credit to those who did
+I was just the person who had been looking for this feature for years
+-->
 
 
 ---
@@ -352,6 +391,10 @@ By understanding what we can do with tuple we learn what we can do with TypeVarT
 * Since 3.11:
     * Can use `Unpack` syntax
     * `tuple[int, str, *tuple[float, ...]]`
+* A range of options
+    * Sized & ordered
+    * Unsized
+    * Sized & ordered & unsized
 
 </v-clicks>
 </Transform>
@@ -465,7 +508,7 @@ layout: center
 # Defining Generic Classes with `TypeVarTuple`
 
 <!--
-Now that we have seen the flexability of the generic tuple, we can see how TypeVarTuple lets use have that same flexability with our own classes
+Now that we have seen the flexibility of the generic tuple, we can see how TypeVarTuple lets use have that same flexibility with our own classes
  -->
 
 ---
