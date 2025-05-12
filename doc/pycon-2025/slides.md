@@ -7,16 +7,22 @@ transition: slide-left
 aspectRatio: 16/9
 favicon: /favicon.ico
 title: "Elastic Generics: Flexible Static Typing with TypeVarTuple and Unpack"
+background: /IMG_4390.jpg
 
 ---
 
+<div class="bg-black bg-opacity-80 p-4 rounded-lg text-white">
+
 # Elastic Generics: Flexible Static Typing with `TypeVarTuple` & `Unpack`
+
 
 <br />
 <br />
 
 #### Christopher Ariza
 #### CTO, Research Affiliates
+
+</div>
 
 <style>
 h1 {font-size: 3.5em !important; line-height: 1.3 !important;}
@@ -62,7 +68,7 @@ def process(
 # Elastic Generics
 
 <!--
-Finally, we have the typing tools to type DataFrame not just column by column, but with expressive definitions that permit variable or elastic regions of columnar types
+Python now has the tools to type DataFrames not just column by column, but with expressive definitions that permit variable or elastic regions of columnar types
 -->
 
 <Transform :scale="1.25">
@@ -86,13 +92,13 @@ def process(
 
 ---
 
-# A Decade of Type Annotations in Python
+# A Decade of Python Type Annotations
 
 
 <Transform :scale="1.25">
 <v-clicks>
 
-Available since Python 3.5 (2015)
+Introduced in Python 3.5 (2015)
 
 An optional layer, independent of run-time
 
@@ -158,7 +164,7 @@ def process(
 layout: quote
 ---
 
-## Most built-in generic containers define unsized, homogeneously typed values
+## All built-in containers (except one!) define unsized, homogeneously typed values
 
 <!-- While a list can hold any type, have to define it as having a single type (which might be a union type)
 (all but one)
@@ -169,7 +175,7 @@ layout: quote
 layout: center
 ---
 
-# Defining new Generic Types
+# Defining New Generic Types
 
 
 ---
@@ -346,7 +352,7 @@ Can be combined with one or more `TypeVar`
 
 ---
 
-# Elastic Generics with TypeVarTuple and Unpack
+# Elastic Generics with `TypeVarTuple` and `Unpack`
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
@@ -400,10 +406,15 @@ Long pondered static typing of arrays and DataFrames
 
 
 ---
-layout: center
+layout: cover
+background: /IMG_4390.jpg
+
 ---
+<div class="bg-black bg-opacity-80 p-4 rounded-lg text-white">
+
 # 1. Typing opportunities with `tuple`
 
+</div>
 <!--
 By understanding what we can do with tuple we learn what we can do with TypeVarTuple
  -->
@@ -848,7 +859,7 @@ process(f3) # mypy fails: error:
 
 Static typing can be elastic
 
-`TypeVarTuple` permits flexible generic types
+`TypeVarTuple` permits flexible, variadic generic types
 
 Unlocks idiomatic DataFrame typing
 
