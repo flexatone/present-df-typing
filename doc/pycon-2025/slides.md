@@ -35,11 +35,34 @@ Pydantic / Panderra: show how these are insufficient
 
 ---
 
+# Static Typing of Complex Containers
+
+<!--
+If you work with DataFrames, you might have noticed that, when passing around DataFrames, your types are woefully insufficient
+-->
+
+<Transform :scale="1.25">
+
+```python {all}
+import pandas as pd
+
+def process(
+    x: pd.DataFrame,
+    y: pd.DataFrame,
+    ) -> pd.DataFrame: ...
+```
+</Transform>
+
+
+
+
+
+---
+
 # Elastic Generics
 
 <!--
-If you work with DataFrames, you probably gave up on typing
-What if you could define streatchable types
+Finally, we have the typing tools to type DataFrame not just column by column, but with expressive definitions that permit variable or elastic regions of columnar types
 -->
 
 <Transform :scale="1.25">
@@ -50,10 +73,9 @@ import numpy as np
 
 def process(
     arg: sf.Frame[
-        sf.IndexDate,            # type of Frame index labels
-        sf.Index[np.str_],       # type of Frame column labels
-        np.int64,                # type of Frame first column
-        *tuple[np.float64, ...], # type of remaining columns
+        sf.IndexDate,                      # type of Frame index labels
+        sf.Index[np.str_],                 # type of Frame column labels
+        np.int64, *tuple[np.float64, ...], # fixed and elastic columnar types
         ],
     ): ...
 ```
@@ -70,7 +92,7 @@ def process(
 <Transform :scale="1.25">
 <v-clicks>
 
-Available since Python 3.5 (PEP 484)
+Available since Python 3.5 (2015)
 
 An optional layer, independent of run-time
 
@@ -138,7 +160,9 @@ layout: quote
 
 ## Most built-in generic containers define unsized, homogeneously typed values
 
-<!-- While a list can hold any type, have to define it as having a single type (which might be a union type) -->
+<!-- While a list can hold any type, have to define it as having a single type (which might be a union type)
+(all but one)
+-->
 
 
 ---
@@ -155,7 +179,7 @@ layout: center
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-Subclass from `Generic`
+Subclass `Generic`
 
 Provide `TypeVar` arguments to `Generic` to specify type variables
 
@@ -205,8 +229,7 @@ No longer need to subclass `Generic`
 ---
 layout: quote
 ---
-## Can a generic define shape or ordering of types?
-
+## Can a generic define size or ordering of types?
 
 <!--
 Examples we have seen are of a homogenously typed collections
@@ -251,11 +274,15 @@ Could an `Iterator[str | bool]` specify an ordering of types?
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-What if you need both ordering and an unbound sequence?
+What if you need both ordered and an unbound sequence of types?
 
-`int` and `str` followed by zero or more `float`
+`int`, `str` followed by zero or more `float`
 
 A dataset of identifiers followed by observations
+
+`tuple[int, str, ZeroOrMore[float]]`
+
+<!-- Not hypothetical -->
 
 </v-clicks>
 </Transform>
