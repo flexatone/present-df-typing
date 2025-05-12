@@ -295,7 +295,7 @@ A dataset of identifiers followed by observations
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-Tools for defining and concertizing generics with both ordering and unbound sequences
+Tools for defining and concretizing generics with both ordered and unbound sequences
 
 Introduced in Python 3.11 (PEP 646)
 
@@ -306,12 +306,12 @@ Backwards compatibility through `typing-extensions`
 
 ---
 
-# `TypeVarTuple`
+# Generics Defined with `TypeVarTuple`
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-A "placeholder" in the typevar parameter list
+A placeholder in the typevar parameter list
 
 Variadic: consumes zero or more types
 
@@ -337,6 +337,7 @@ Can be combined with one or more `TypeVar`
 * The `*` matters:
     * `('a', 5, 3, 8, 11): tuple[str, *tuple[int, ..]]`
     * `('a', (5, 3)): tuple[str, tuple[int, ..]]`
+* Think `*tuple[int, ...]` as `ZeroOrMore[int]]`
 </v-clicks>
 </Transform>
 
@@ -349,6 +350,8 @@ Can be combined with one or more `TypeVar`
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
+
+<!-- now that we have some idea of what these things are for we can explore them in depth -->
 
 1. Typing opportunities with `tuple` and `Unpack` syntax
 2. Using `TypeVarTuple` to define generic classes
@@ -389,7 +392,7 @@ Since 2012, builder of financial systems in Python
 
 Creator of StaticFrame, an alternative DataFrame library
 
-Long pondered static typing of DataFrames
+Long pondered static typing of arrays and DataFrames
 </v-clicks>
 </Transform>
 
@@ -399,7 +402,7 @@ Long pondered static typing of DataFrames
 ---
 layout: center
 ---
-# Typing opportunities with `tuple`
+# 1. Typing opportunities with `tuple`
 
 <!--
 By understanding what we can do with tuple we learn what we can do with TypeVarTuple
@@ -482,7 +485,7 @@ process((4.2, 5.8, 7.2, 'y')) # mypy fails: error:
 
 Can define only one unsized `Unpack` region
 
-Ordered segments can proceed an `Unpack` region
+Ordered segments be before or after an `Unpack` region
 
 ```python {1|1-3|1-4|1-5|all}
 def process(arg: tuple[int, str, *tuple[float, ...]]): ...
@@ -502,7 +505,7 @@ process((3, 'x', 4.2, 5.8, 7.2, None)) # mypy fails: error:
 
 
 
----
+<!-- ---
 
 # Concretizing `tuple`: Sized & Ordered & Unsized & Sized & Ordered
 
@@ -524,7 +527,11 @@ process((3, 'x', 4.2, 5.8, 'y', 7.2, 'x', False)) # mypy fails: error:
 ```
 
 </v-clicks>
-</Transform>
+</Transform> -->
+
+
+
+
 
 
 ---
@@ -532,7 +539,7 @@ layout: center
 
 ---
 
-# Defining Generic Classes with `TypeVarTuple`
+# 2. Defining Generic Classes with `TypeVarTuple`
 
 <!--
 Now that we have seen the flexibility of the generic tuple, we can see how TypeVarTuple lets use have that same flexibility with our own classes
@@ -545,7 +552,7 @@ Now that we have seen the flexibility of the generic tuple, we can see how TypeV
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-One (and only one) type variable can be a `TypeVarTuple`
+Only one type variable can be a `TypeVarTuple`
 
 A placeholder for ordered types and/or an `Unpack` expression
 
@@ -588,7 +595,7 @@ r2: Record[int, str, *tuple[float, ...]] # unpack is star expansion
 
 ---
 
-# 1. Concretizing `Record`
+# Concretizing `Record`
 
 <Transform :scale="1.25">
 
@@ -609,9 +616,11 @@ process(Record((3, 'x', 4.2, 5.2))) # mypy fails: error:
 
 ---
 
-# 2. Concretizing `Record`
+# Concretizing `Record`
 
 <Transform :scale="1.25">
+
+<!-- We can make the same class concrete in many different ways -->
 
 ```python {1-3|5|5-7|5-8|5-12}
 class Record[*Ts]:
@@ -632,7 +641,7 @@ process(Record((4.2, 5.2, 'x'))) # mypy fails: error:
 
 ---
 
-# 3. Concretizing `Record`
+# Concretizing `Record`
 
 <Transform :scale="1.25">
 
@@ -686,7 +695,7 @@ layout: center
 
 ---
 
-# Generic DataFrames
+# 3. Generic DataFrames
 
 
 ---
@@ -772,10 +781,9 @@ import numpy as np
 
 def process(
     arg: sf.Frame[
-        sf.IndexDate,            # type of Frame index labels
-        sf.Index[np.str_],       # type of Frame column labels
-        np.int64,                # type of Frame first column
-        *tuple[np.float64, ...], # type of remaining columns
+        sf.IndexDate,                      # type of Frame index labels
+        sf.Index[np.str_],                 # type of Frame column labels
+        np.int64, *tuple[np.float64, ...], # type of first and following columns
         ],
     ): ...
 ```
