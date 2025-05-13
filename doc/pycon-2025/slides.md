@@ -11,7 +11,7 @@ background: /IMG_4390.jpg
 
 ---
 
-<div class="bg-black bg-opacity-80 p-4 rounded-lg text-white">
+<div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
 
 # Elastic Generics: Flexible Static Typing with `TypeVarTuple` & `Unpack`
 
@@ -30,8 +30,6 @@ h1 {font-size: 3.5em !important; line-height: 1.3 !important;}
 
 <!-- NOTE: this is tested on slidev 0.50, 0.51 did not work!
 
-TODO: start with some interesting and compelling examples
-define / replace concretize
 Point out how strange TaggedRecord is
 Pydantic / Panderra: show how these are insufficient
 
@@ -148,7 +146,7 @@ def process(
 <v-clicks depth="1">
 
 * Generic types are made concrete with type parameters
-* Generics require one or more positional parameters
+* Type parameters are positional parameters
 * Python containers are generic
     * `list[str]`
     * `set[int]`
@@ -164,7 +162,7 @@ def process(
 layout: quote
 ---
 
-## All built-in containers (except one!) define unsized, homogeneously typed values
+## All built-in generic containers (except one!) define unsized, homogeneously typed values
 
 <!-- While a list can hold any type, have to define it as having a single type (which might be a union type)
 (all but one)
@@ -175,7 +173,7 @@ layout: quote
 layout: center
 ---
 
-# Defining New Generic Types
+# Defining Generic Types
 
 
 ---
@@ -187,7 +185,7 @@ layout: center
 
 Subclass `Generic`
 
-Provide `TypeVar` arguments to `Generic` to specify type variables
+Provide `TypeVar` instances to `Generic` to specify type variables
 
 ```python {1-2|1-4|1-5|1-6|1-7|all}
 TK = TypeVar('TK')
@@ -224,7 +222,7 @@ class Map[TK, TV]:
 
 No longer need to subclass `Generic`
 
-`TypeVar` defined implicitly
+`TypeVar` implicitly defined
 
 </v-clicks>
 </Transform>
@@ -250,7 +248,7 @@ Examples we have seen are of a homogenously typed collections
 
 Could a `list[str]` specify a size?
 
-Could an `Iterator[str | bool]` specify an ordering of types?
+Could an `Sequence[str | bool]` specify an ordering of `str` and `bool`?
 
 </v-clicks>
 </Transform>
@@ -263,7 +261,7 @@ Could an `Iterator[str | bool]` specify an ordering of types?
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-* A `tuple` can do more
+* `tuple` can do more
 * A sequence with defined size and ordering of types
     * `tuple[str, float, float, bool]`
 * An unsized sequence of homogenous types
@@ -280,15 +278,15 @@ Could an `Iterator[str | bool]` specify an ordering of types?
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-What if you need both ordered and an unbound sequence of types?
+Combining both ordered and unsized sequences of types
 
-`int`, `str` followed by zero or more `float`
+Fixed `int`, `str` followed by zero or more `float`
 
 A dataset of identifiers followed by observations
 
 `tuple[int, str, ZeroOrMore[float]]`
 
-<!-- Not hypothetical -->
+<!-- Not hypothetical: this is a practical form of dataset -->
 
 </v-clicks>
 </Transform>
@@ -301,7 +299,7 @@ A dataset of identifiers followed by observations
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-Tools for defining and concretizing generics with both ordered and unbound sequences
+Defining and concretizing generics with both ordered and unsized sequences
 
 Introduced in Python 3.11 (PEP 646)
 
@@ -317,9 +315,9 @@ Backwards compatibility through `typing-extensions`
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-A placeholder in the typevar parameter list
+A placeholder in the type parameter list
 
-Variadic: consumes zero or more types
+Variadic: permits zero or more type variables
 
 Supports `tuple`-like flexibility
 
@@ -336,28 +334,26 @@ Can be combined with one or more `TypeVar`
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-* Both a component and a new syntax for concretizing `TypeVarTuple`
+* A component or syntax for concretizing `TypeVarTuple`
 * Leverages the unsized sequence notation of `tuple`
 * Python < 3.11: `Unpack[tuple[int, ...]]`
 * Python >= 3.11: `*tuple[int, ...]`
 * The `*` matters:
-    * `('a', 5, 3, 8, 11): tuple[str, *tuple[int, ..]]`
-    * `('a', (5, 3)): tuple[str, tuple[int, ..]]`
+    * `('a', 5, 3, 8, 11): tuple[str, *tuple[int, ...]]`
+    * `('a', (5, 3)): tuple[str, tuple[int, ...]]`
 * Think `*tuple[int, ...]` as `ZeroOrMore[int]]`
 </v-clicks>
 </Transform>
-
-
 
 
 ---
 
 # Elastic Generics with `TypeVarTuple` and `Unpack`
 
+<!-- now that we have some idea of what these things are for we can explore them in depth -->
+
 <Transform :scale="1.25">
 <v-clicks depth="1">
-
-<!-- now that we have some idea of what these things are for we can explore them in depth -->
 
 1. Typing opportunities with `tuple` and `Unpack` syntax
 2. Using `TypeVarTuple` to define generic classes
@@ -410,7 +406,7 @@ layout: cover
 background: /IMG_4390.jpg
 
 ---
-<div class="bg-black bg-opacity-80 p-4 rounded-lg text-white">
+<div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
 
 # 1. Typing opportunities with `tuple`
 
@@ -546,15 +542,22 @@ process((3, 'x', 4.2, 5.8, 'y', 7.2, 'x', False)) # mypy fails: error:
 
 
 ---
-layout: center
+layout: cover
+background: /IMG_4390.jpg
 
 ---
+<div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
 
 # 2. Defining Generic Classes with `TypeVarTuple`
+
+</div>
 
 <!--
 Now that we have seen the flexibility of the generic tuple, we can see how TypeVarTuple lets use have that same flexibility with our own classes
  -->
+
+
+
 
 ---
 
@@ -701,12 +704,22 @@ process(TaggedRecord('foo', (4.2, 5.2, 'x'))) # mypy fails: error:
 </Transform>
 
 
----
-layout: center
+
+
 
 ---
+layout: cover
+background: /IMG_4390.jpg
+
+---
+<div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
 
 # 3. Generic DataFrames
+
+</div>
+
+
+
 
 
 ---
@@ -786,7 +799,7 @@ class Frame[TIndex, TColumns, *TDtypes]: ...
 
 <Transform :scale="1.25">
 
-```python {1-4|1-5|1-6|1-7|1-8|1-12}
+```python {1-4|1-5|1-6|1-7|1-12}
 import static_frame as sf
 import numpy as np
 
@@ -803,7 +816,7 @@ def process(
 
 ---
 
-# 1. Type Checking a DataFrame
+# 1. Type-Checking DataFrames
 
 <Transform :scale="1.25">
 
@@ -811,7 +824,7 @@ def process(
 f2: sf.Frame[
     sf.IndexDate,
     sf.Index[np.str_],
-    np.int64, np.float64, np.float64, np.float64, # first column is int, remaining are float
+    np.int64, np.float64, np.float64, np.float64, # int followed by three float columns
     ] = sf.Frame.from_fields(
         ([20, 30], [1.2, 5.4], [8.1, 3.2], [3.1, 7.9]),
         index=sf.IndexDate(('2025-01-03', '2025-02-04')),
@@ -825,7 +838,7 @@ process(f2) # mypy passes
 
 ---
 
-# 2. Type Checking DataFrames
+# 2. Type-Checking DataFrames
 
 <Transform :scale="1.25">
 
@@ -861,19 +874,21 @@ Static typing can be elastic
 
 `TypeVarTuple` permits flexible, variadic generic types
 
-Unlocks idiomatic DataFrame typing
+Unlock idiomatic DataFrame typing
 
 </v-clicks>
 </Transform>
 
 
 
-
+---
+layout: cover
+background: /IMG_4390.jpg
 
 ---
-layout: center
-
----
+<div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
 
 # Thank you
+
+</div>
 
