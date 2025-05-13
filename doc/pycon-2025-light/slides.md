@@ -6,15 +6,14 @@ lineNumbers: false
 transition: slide-left
 aspectRatio: 16/9
 favicon: /favicon.ico
-title: "Static Typing NumPy Arrays"
+title: "."
 # background: /IMG_4390.jpg
 
 ---
 
 <div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
 
-# Fully Typing NumPy Arrays
-
+# Doing More with Your NumPy Type Annotation
 
 <br />
 <br />
