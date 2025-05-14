@@ -36,7 +36,6 @@ Pydantic / Panderra: show how these are insufficient
 -->
 
 
-
 ---
 
 # Static Typing of Complex Containers
@@ -57,16 +56,12 @@ def process(
 ```
 </Transform>
 
-
-
-
-
 ---
 
 # Elastic Generics
 
 <!--
-Python now has the tools to type DataFrames not just column by column, but with expressive definitions that permit variable or elastic regions of columnar types
+Python now has the tools to type DataFrames, not just column by column, but with expressive definitions that permit variable or elastic regions of columnar types
 -->
 
 <Transform :scale="1.25">
@@ -84,8 +79,6 @@ def process(
     ): ...
 ```
 </Transform>
-
-
 
 
 ---
@@ -108,6 +101,7 @@ Numerous tools for run-time validation
 
 </v-clicks>
 </Transform>
+
 
 ---
 
@@ -145,8 +139,7 @@ def process(
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-* Generic types are made concrete with type parameters
-* Type parameters are positional parameters
+* Generics made concrete with positional type parameters
 * Python containers are generic
     * `list[str]`
     * `set[int]`
@@ -162,7 +155,7 @@ def process(
 layout: quote
 ---
 
-## All built-in generic containers (except one!) define unsized, homogeneously typed values
+## All built-in generic containers (except one!) define unsized, homogeneous type
 
 <!-- While a list can hold any type, have to define it as having a single type (which might be a union type)
 (all but one)
@@ -185,7 +178,7 @@ layout: center
 
 Subclass `Generic`
 
-Provide `TypeVar` instances to `Generic` to specify type variables
+Provide `TypeVar` instances to `Generic`
 
 ```python {1-2|1-4|1-5|1-6|1-7|all}
 TK = TypeVar('TK')
@@ -201,8 +194,6 @@ class Map(Generic[TK, TV]):
 
 </v-clicks>
 </Transform>
-
-
 
 
 ---
@@ -228,8 +219,6 @@ No longer need to subclass `Generic`
 </Transform>
 
 
-
-
 ---
 layout: quote
 ---
@@ -241,7 +230,7 @@ Examples we have seen are of a homogenously typed collections
 
 ---
 
-# Asking More from our Types
+# Asking More from our Generics
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
@@ -261,8 +250,8 @@ Could an `Sequence[str | bool]` specify an ordering of `str` and `bool`?
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-* `tuple` can do more
-* A sequence with defined size and ordering of types
+* Generic `tuple` can do more
+* A sequence with size and type ordering
     * `tuple[str, float, float, bool]`
 * An unsized sequence of homogenous types
     * `tuple[str, ...]`
@@ -280,9 +269,9 @@ Could an `Sequence[str | bool]` specify an ordering of `str` and `bool`?
 
 Combining both ordered and unsized sequences of types
 
-Fixed `int`, `str` followed by zero or more `float`
-
 A dataset of identifiers followed by observations
+
+Fixed `int`, `str` followed by zero or more `float`
 
 `tuple[int, str, ZeroOrMore[float]]`
 
@@ -315,13 +304,13 @@ Backwards compatibility through `typing-extensions`
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-A placeholder in the type parameter list
+A type of `TypeVar`
 
-Variadic: permits zero or more type variables
+A zero or more "placeholder" in the type parameters
 
 Supports `tuple`-like flexibility
 
-Can be combined with one or more `TypeVar`
+Can mix with one or more `TypeVar`
 
 </v-clicks>
 </Transform>
@@ -338,7 +327,7 @@ Can be combined with one or more `TypeVar`
 * Leverages the unsized sequence notation of `tuple`
 * Python < 3.11: `Unpack[tuple[int, ...]]`
 * Python >= 3.11: `*tuple[int, ...]`
-* The `*` matters:
+* Star-expansion "flattens" the types:
     * `('a', 5, 3, 8, 11): tuple[str, *tuple[int, ...]]`
     * `('a', (5, 3)): tuple[str, tuple[int, ...]]`
 * Think `*tuple[int, ...]` as `ZeroOrMore[int]]`

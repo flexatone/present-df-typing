@@ -59,10 +59,33 @@ def process(
 import numpy as np
 
 def process(
-    x: np.ndarray[tuple[Any, Any], np.dtype[np.inexact]],
+    x: np.ndarray[tuple[Any, Any], np.dtype[np.floating]],
     y: np.ndarray[tuple[Any], np.dtype[np.bool_]],
-    ) -> np.ndarray[tuple[Any, Any], np.dtype[np.floating]]: ...
+    ) -> np.ndarray[tuple[Any, Any], np.dtype[np.float64]]: ...
 ```
+</Transform>
+
+
+
+---
+
+# The Generic `np.ndarray`
+
+<Transform :scale="1.25">
+<v-clicks>
+
+* Two arguments
+    * shape
+    * dtype
+* until NumPy 2.1:
+    ```python
+    np.ndarray[Any, np.dtype[np.int8]]
+    ```
+* from NumPy 2.1:
+    ```python
+    np.ndarray[tuple[Any, ...], np.dtype[np.int8]]
+    ```
+</v-clicks>
 </Transform>
 
 
@@ -74,7 +97,7 @@ def process(
 
 <Transform :scale="1.25">
 
-```python {all}
+```python {1-3|4|5|6}
 import numpy as np
 
 np.dtype[np.int8]
@@ -88,17 +111,16 @@ np.dtype[np.number]
 
 ---
 
-# Shapes are `tuple[]`
+# Shapes are Generic
 
 
 <Transform :scale="1.25">
 
-```python {all}
+```python {1|2|3|4}
 tuple[Any, ...]
 tuple[Any]
 tuple[Any, Any]
-
-tuple[Literal[20], Anu]
+tuple[Literal[20], Any]
 
 ```
 </Transform>
@@ -107,23 +129,7 @@ tuple[Literal[20], Anu]
 
 ---
 
-# The Generic `np.ndarray`
-
-
-<Transform :scale="1.25">
-
-Two arguments:
-    shape
-    dtype
-
-
-</Transform>
-
-
-
----
-
-# The Generic `np.ndarray`
+# Concretizing `np.ndarray`
 
 
 <Transform :scale="1.25">
