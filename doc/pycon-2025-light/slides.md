@@ -11,9 +11,8 @@ title: "."
 
 ---
 
-<div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
 
-# Doing More with Your NumPy Type Annotation
+# Doing More with NumPy Array Type Annotations
 
 <br />
 <br />
@@ -21,7 +20,6 @@ title: "."
 #### Christopher Ariza
 #### CTO, Research Affiliates
 
-</div>
 
 <style>
 h1 {font-size: 3.5em !important; line-height: 1.3 !important;}
@@ -34,7 +32,7 @@ h1 {font-size: 3.5em !important; line-height: 1.3 !important;}
 # Shallow Typing
 
 
-<Transform :scale="1.25">
+<Transform :scale="1.5">
 
 ```python {all}
 import numpy as np
@@ -53,15 +51,15 @@ def process(
 # Deep Array Typing
 
 
-<Transform :scale="1.25">
+<Transform :scale="1.5">
 
 ```python {all}
 import numpy as np
 
 def process(
-    x: np.ndarray[tuple[Any, Any], np.dtype[np.floating]],
-    y: np.ndarray[tuple[Any], np.dtype[np.bool_]],
-    ) -> np.ndarray[tuple[Any, Any], np.dtype[np.float64]]: ...
+    x: np.ndarray[tuple[int, int], np.dtype[np.floating]],
+    y: np.ndarray[tuple[int], np.dtype[np.bool_]],
+    ) -> np.ndarray[tuple[int, int], np.dtype[np.float64]]: ...
 ```
 </Transform>
 
@@ -71,10 +69,10 @@ def process(
 
 # The Generic `np.ndarray`
 
-<Transform :scale="1.25">
+<Transform :scale="1.5">
 <v-clicks>
 
-* Two arguments
+* Two type variables
     * shape
     * dtype
 * until NumPy 2.1:
@@ -83,7 +81,7 @@ def process(
     ```
 * from NumPy 2.1:
     ```python
-    np.ndarray[tuple[Any, ...], np.dtype[np.int8]]
+    np.ndarray[tuple[int, ...], np.dtype[np.int8]]
     ```
 </v-clicks>
 </Transform>
@@ -95,12 +93,13 @@ def process(
 # Dtypes are Generic
 
 
-<Transform :scale="1.25">
+<Transform :scale="1.5">
 
-```python {1-3|4|5|6}
+```python {1-3|4|5|6|7}
 import numpy as np
 
 np.dtype[np.int8]
+np.dtype[np.uint16]
 np.dtype[np.integer]
 np.dtype[np.floating]
 np.dtype[np.number]
@@ -111,16 +110,16 @@ np.dtype[np.number]
 
 ---
 
-# Shapes are Generic
+# Shapes are `tuple`
 
 
-<Transform :scale="1.25">
+<Transform :scale="1.5">
 
 ```python {1|2|3|4}
-tuple[Any, ...]
-tuple[Any]
-tuple[Any, Any]
-tuple[Literal[20], Any]
+tuple[int, ...]  # ND
+tuple[int]  # 1D
+tuple[int, int] # 2D
+tuple[Literal[20], int] # 2D, 20 rows
 
 ```
 </Transform>
@@ -132,11 +131,33 @@ tuple[Literal[20], Any]
 # Concretizing `np.ndarray`
 
 
-<Transform :scale="1.25">
+<Transform :scale="1.5">
 
-```python {all}
+```python {1-2|3-4|5-6}
+# 1D, any 8 bit integer
+def process(x: np.ndarray[tuple[int], np.dtype[np.int8]]): ...
+# 2D, any integer
+def process(x: np.ndarray[tuple[int, int], np.dtype[np.integer]]): ...
+# ND, datetime64
+def process(x: np.ndarray[tuple[int, int], np.dtype[np.datetime64]]): ...
+```
+</Transform>
 
-def process(x: np.ndarray[tp.Any, np.dtype[np.uint8]]): ...
+
+---
+
+# Static Type Checking with `mypy`
+
+
+<Transform :scale="1.5">
+
+```python {1-2|3-4|5-6}
+# 1D, any 8 bit integer
+def process(x: np.ndarray[tuple[int], np.dtype[np.int8]]): ...
+# 2D, any integer
+def process(x: np.ndarray[tuple[int, int], np.dtype[np.integer]]): ...
+# ND, datetime64
+def process(x: np.ndarray[tuple[int, int], np.dtype[np.datetime64]]): ...
 ```
 </Transform>
 
@@ -144,16 +165,11 @@ def process(x: np.ndarray[tp.Any, np.dtype[np.uint8]]): ...
 
 
 
-
-
 ---
 layout: cover
-background: /IMG_4390.jpg
 
 ---
-<div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
 
 # Thank you
 
-</div>
 
