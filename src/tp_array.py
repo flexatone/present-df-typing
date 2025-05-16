@@ -29,38 +29,34 @@ import typing as tp
 
 
 
-def process1(x: np.ndarray[tuple[tp.Any], np.dtype[np.integer]]): ...
+def process1(x: np.ndarray[tuple[int], np.dtype[np.signedinteger]]): ...
 
 a1 = np.empty(100, dtype=np.int16)
-process1(a1) # passes
+process1(a1) # mypy passes
 
-a2 = np.empty(100, dtype=np.int8)
-process1(a2) # passes
+a2 = np.empty(100, dtype=np.uint8)
+process1(a2) # mypy fails
+# tp_array.py:38: error: Argument 1 to "process1" has incompatible type "ndarray[tuple[int], dtype[unsignedinteger[_8Bit]]]"; expected "ndarray[tuple[int], dtype[signedinteger[Any]]]"  [arg-type]
 
-a3 = np.empty(100, dtype=np.float64)
-process1(a3) # fails
-# tp_array.py:41: error: Argument 1 to "process1" has incompatible type "ndarray[tuple[int], dtype[float64]]"; expected "ndarray[tuple[Any], dtype[integer[Any]]]"  [arg-type]
 
-a4 = np.empty((100, 100, 100), dtype=np.int16)
-process1(a4) # fails
-# tp_array.py:47: error: Argument 1 to "process1" has incompatible type "ndarray[tuple[int, int, int], dtype[signedinteger[_16Bit]]]"; expected "ndarray[tuple[Any], dtype[integer[Any]]]"  [arg-type]
+a3 = np.empty((100, 100, 100), dtype=np.int64)
+process1(a3) # mypy fails
+# tp_array.py:43: error: Argument 1 to "process1" has incompatible type "ndarray[tuple[int, int, int], dtype[signedinteger[_64Bit]]]"; expected "ndarray[tuple[int], dtype[signedinteger[Any]]]"  [arg-type]
 
-# then do the same with SF.typeguard
 
 
 import static_frame as sf
-
 @sf.CallGuard.check
-def process2(x: np.ndarray[tuple[tp.Any], np.dtype[np.integer]]): ...
+def process2(x: np.ndarray[tuple[int], np.dtype[np.signedinteger]]): ...
 
-# process2(a3) # fails
+a2 = np.empty(100, dtype=np.uint8)
+process2(a2)
 # static_frame.core.type_clinic.ClinicError:
-# In args of (x: ndarray[tuple[Any], dtype[integer]]) -> Any
+# In args of (x: ndarray[tuple[int], dtype[signedinteger]]) -> Any
 # └── In arg x
-#     └── ndarray[tuple[Any], dtype[integer]]
-#         └── dtype[integer]
-#             └── Expected integer, provided float64 invalid
+#     └── ndarray[tuple[int], dtype[signedinteger]]
+#         └── dtype[signedinteger]
+#             └── Expected signedinteger, provided uint8 invalid
 
-process2(a4) # fails
+process2(a3) # fails
 
-print(sf.CallGuard.check)
