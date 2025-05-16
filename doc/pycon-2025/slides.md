@@ -14,7 +14,7 @@ background: /IMG_4390.jpg
 
 ---
 
-<div class="bg-black bg-opacity-70 p-4 rounded-xl text-white">
+<div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
 
 # Elastic Generics: Flexible Static Typing with `TypeVarTuple` & `Unpack`
 
@@ -37,26 +37,6 @@ h1 {font-size: 3.5em !important; line-height: 1.3 !important;}
 
 ---
 
-# Static Typing of Complex Containers
-
-<!--
-If you work with DataFrames, you might have noticed that, when passing around DataFrames, your types are woefully insufficient
--->
-
-<Transform :scale="1.25">
-
-```python {all}
-import pandas as pd
-
-def process(
-    x: pd.DataFrame,
-    y: pd.DataFrame,
-    ) -> pd.DataFrame: ...
-```
-</Transform>
-
----
-
 # Elastic Generics
 
 <!--
@@ -64,8 +44,12 @@ Python now has the tools to type DataFrames, not just column by column, but with
 -->
 
 <Transform :scale="1.25">
+<v-clicks>
 
-```python {all}
+Sometimes a type needs to be stretchable
+
+
+```python {all|8}
 import static_frame as sf
 import numpy as np
 
@@ -77,6 +61,8 @@ def process(
         ],
     ): ...
 ```
+
+</v-clicks>
 </Transform>
 
 
@@ -162,11 +148,16 @@ layout: quote
 
 
 ---
-layout: center
+layout: cover
+background: /IMG_4138.jpg
+
 ---
+
+<div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
 
 # Defining Generic Types
 
+</div>
 
 ---
 
@@ -179,7 +170,7 @@ Subclass `Generic`
 
 Provide `TypeVar` instances to `Generic`
 
-```python {1-2|1-4|1-5|1-6|1-7|all}
+```python {1-2|1-4|all}
 TK = TypeVar('TK')
 TV = TypeVar('TV')
 
@@ -219,20 +210,13 @@ No longer need to subclass `Generic`
 
 
 ---
-layout: quote
----
-## Can a generic define size or ordering of types?
-
-<!--
-Examples we have seen are of a homogenously typed collections
- -->
-
----
 
 # Asking More from our Generics
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
+
+Can a generic define size or ordering of types?
 
 Could a `list[str]` specify a size?
 
@@ -254,30 +238,30 @@ Could an `Sequence[str | bool]` specify an ordering of `str` and `bool`?
     * `tuple[str, float, float, bool]`
 * An unsized sequence of homogenous types
     * `tuple[str, ...]`
+* What if we want both?
 
 </v-clicks>
 </Transform>
 
 
----
+<!-- ---
 
 # Extending `tuple` Flexibility
 
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-Combining both ordered and unsized sequences of types
+Can ordered and unsized sequences of types be combined?
 
-A dataset of identifiers followed by observations
 
 Fixed `int`, `str` followed by zero or more `float`
 
+
 `tuple[int, str, ZeroOrMore[float]]`
 
-<!-- Not hypothetical: this is a practical form of dataset -->
 
 </v-clicks>
-</Transform>
+</Transform> -->
 
 
 ---
@@ -285,7 +269,7 @@ Fixed `int`, `str` followed by zero or more `float`
 # `TypeVarTuple` and `Unpack`
 
 <Transform :scale="1.25">
-<v-clicks depth="2">
+<v-clicks depth="1">
 
 Defining and concretizing generics with both ordered and unsized sequences
 
@@ -298,7 +282,7 @@ Backwards compatibility through `typing-extensions`
 
 ---
 
-# Generics Defined with `TypeVarTuple`
+# Defining Generics with `TypeVarTuple`
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
@@ -329,7 +313,7 @@ Can mix with `TypeVar`
 * Star-expansion "flattens" the types:
     * `('a', 5, 3, 8, 11): tuple[str, *tuple[int, ...]]`
     * `('a', (5, 3)): tuple[str, tuple[int, ...]]`
-* Think `*tuple[int, ...]` as `ZeroOrMore[int]]`
+
 </v-clicks>
 </Transform>
 
@@ -549,7 +533,7 @@ process((3, 'x', 4.2, 5.8, 'y', 7.2, 'x', False)) # mypy fails: error:
 
 ---
 layout: cover
-background: /IMG_3478.jpg
+background: /IMG_4138.jpg
 
 ---
 <div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
@@ -889,7 +873,7 @@ Unlock idiomatic DataFrame typing
 
 ---
 layout: cover
-background: /IMG_4390.jpg
+background: /IMG_3478.jpg
 
 ---
 <div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
