@@ -39,7 +39,7 @@ h1 {font-size: 3.5em !important; line-height: 1.3 !important;}
 
 # Elastic Generics
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks>
 
 Sometimes a type needs to be stretchable
@@ -67,7 +67,7 @@ def process(
 # A Decade of Python Type Annotations
 
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks>
 
 Introduced in Python 3.5 (2015)
@@ -89,7 +89,7 @@ Still a work in progress
 ---
 
 # Elemental & Generic Types
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="1">
 
 Elemental types
@@ -98,7 +98,6 @@ Elemental types
 def process(
         x: int,
         y: float,
-        z: bool,
         ): ...
 ```
 
@@ -107,8 +106,7 @@ Types composed of other types are generic
 ```python
 def process(
         x: Sequence[int],
-        y: frozenset[str],
-        z: dict[str, bool],
+        y: dict[str, bool],
         ): ...
 ```
 
@@ -119,7 +117,7 @@ def process(
 ---
 
 # Generic Types
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="1">
 
 * Generics are made concrete with type parameters
@@ -138,7 +136,7 @@ def process(
 
 # Defining Generic Types in Python (< 3.12)
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="1">
 
 Subclass `Generic`
@@ -165,7 +163,7 @@ class Map(Generic[TK, TV]):
 
 # Defining Generic Types in Python (>= 3.12)
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="1">
 
 No longer need to subclass `Generic`
@@ -189,7 +187,7 @@ class Map[TK, TV]:
 
 # Asking More from our Generics
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="2">
 
 Can a generic define size or ordering of types?
@@ -206,7 +204,7 @@ Could an `Sequence[str | bool]` specify an ordering of `str` and `bool`?
 
 # The Dual Capability of `tuple`
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="1">
 
 * A sequence with size and type ordering
@@ -224,7 +222,7 @@ Could an `Sequence[str | bool]` specify an ordering of `str` and `bool`?
 
 # Extending `tuple` Flexibility
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="1">
 
 Can ordered and unsized sequences of types be combined?
@@ -244,7 +242,7 @@ Fixed `int`, `str` followed by zero or more `float`
 
 # `TypeVarTuple` and `Unpack`
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="1">
 
 Defining and concretizing generics with both ordered and unsized sequences
@@ -261,7 +259,7 @@ Backwards compatibility through `typing-extensions`
 
 # Defining Generics with `TypeVarTuple`
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="2">
 
 A placeholder for zero or more concrete types
@@ -278,7 +276,7 @@ Can proceed or follow one or more `TypeVar`
 
 # `Unpack`
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="2">
 
 * A component or syntax for concretizing `TypeVarTuple`
@@ -304,7 +302,7 @@ Can proceed or follow one or more `TypeVar`
 
 <!-- now that we have some idea of what these things are for we can explore them in depth -->
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="1">
 
 1. Typing opportunities with `tuple` and `Unpack` syntax
@@ -331,7 +329,7 @@ I was just the person who had been looking for this feature for years
 
 # PEP & Implementation
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 
 PEP 646: Mark Mendoza, Matthew Rahtz, Kumar Srinivasan, Vincent Siles
 
@@ -349,7 +347,7 @@ Support in Pyright and Mypy
 
 # About Me
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks>
 
 CTO at Research Affiliates
@@ -389,7 +387,7 @@ By understanding what we can do with tuple we learn what we can do with TypeVarT
 
 # Concretizing `tuple`
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="1">
 
 * Since 3.5:
@@ -411,7 +409,7 @@ By understanding what we can do with tuple we learn what we can do with TypeVarT
 
 # Concretizing `tuple`: Sized & Ordered
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="1">
 
 Define size and an ordering of types
@@ -433,7 +431,7 @@ process((3, 'x', 4.2, 5.2)) # mypy fails: error:
 
 # Concretizing `tuple`: Unsized
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="1">
 
 Define zero or more of one type
@@ -457,7 +455,7 @@ process((4.2, 5.8, 7.2, 'y')) # mypy fails: error:
 
 # Concretizing `tuple`: Sized & Ordered & Unsized
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="1">
 
 Can define only one unsized `Unpack` region
@@ -467,7 +465,6 @@ Ordered segments be before or after an `Unpack` region
 ```python {1|1-3|1-4|1-5|all}
 def process(arg: tuple[int, str, *tuple[float, ...]]): ...
 
-process((3, 'x', 4.2)) # mypy passes
 process((3, 'x')) # mypy passes
 process((3, 'x', 4.2, 5.8, 7.2)) # mypy passes
 
@@ -503,7 +500,7 @@ Now that we have seen the flexibility of the generic tuple, we can see how TypeV
 
 # Defining Generic Classes with `TypeVarTuple`
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="1">
 
 New generics can leverage the flexibility of `tuple`
@@ -520,7 +517,7 @@ Normal `TypeVar` can proceed and/or follow a single `TypeVarTuple`
 
 # Generic Classes with `TypeVarTuple` and `Unpack` (< 3.12)
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 
 ```python {0|1|1-2|1-4|1-5}
 Ts = TypeVarTuple('Ts')
@@ -536,7 +533,7 @@ r2: Record[int, str, Unpack[tuple[float, ...]]] # unpack is a component
 
 # Generic Classes with `TypeVarTuple` and `Unpack` (>= 3.12)
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 
 ```python {1|1-3|1-4}
 class Record[*Ts]: ...
@@ -551,7 +548,7 @@ r2: Record[int, str, *tuple[float, ...]] # unpack is star expansion
 
 # Concretizing `Record`
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 
 ```python {1|1-3|5|5-7|5-10}
 class Record[*Ts]:
@@ -572,7 +569,7 @@ process(Record((3, 'x', 4.2, 5.2))) # mypy fails: error:
 
 # Concretizing `Record`
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 
 <!-- We can make the same class concrete in many different ways -->
 
@@ -597,7 +594,7 @@ process(Record((4.2, 5.2, 'x'))) # mypy fails: error:
 
 # Concretizing `Record`
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 
 ```python {1-3|5|5-7|5-8|5-13}
 class Record[*Ts]:
@@ -621,7 +618,7 @@ process(Record((3, 4.2, 5.2, False))) # mypy fails: error:
 
 # Combining `TypeVar` and `TypeVarTuple`
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 
 ```python {1|1-4|6|6-8|6-12|6-16}
 class TaggedRecord[T, *Ts]:
@@ -633,9 +630,6 @@ def process(arg: TaggedRecord[str, str, *tuple[float, ...]]): ...
 
 process(TaggedRecord('foo', ('x', 4.2, 5.2))) # mypy passes
 
-process(TaggedRecord(3, ('x', 4.2, 5.2))) # mypy fails: error:
-    # Argument 1 to "TaggedRecord" has incompatible type "int";
-    # expected "str"
 process(TaggedRecord('foo', (4.2, 5.2, 'x'))) # mypy fails: error:
     # Argument 2 to "TaggedRecord" has incompatible type
     # "tuple[float, float, str]";
@@ -666,7 +660,7 @@ background: /IMG_4390.jpg
 
 # Insufficient Type Specification
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="1">
 
 Common typing with Pandas DataFrames is insufficient
@@ -685,7 +679,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 
 # DataFrames are Generic
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="2">
 
 * A DataFrame type is generic to many variables
@@ -702,7 +696,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 
 # A Comprehensively Generic DataFrame
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks depth="2">
 
 StaticFrame 2: a complete generic DataFrame
@@ -723,7 +717,7 @@ Integrated with generic `Series`, `Index`, and `IndexHierarchy`
 
 # StaticFrame's Generic DataFrame
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 
 ```python
 class Frame[TIndex, TColumns, *TDtypes]: ...
@@ -735,7 +729,7 @@ class Frame[TIndex, TColumns, *TDtypes]: ...
 
 # Concretizing a DataFrame
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 
 ```python {1-4|1-5|1-6|1-7|1-12}
 import static_frame as sf
@@ -756,7 +750,7 @@ def process(
 
 # Type-Checking DataFrames
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 
 ```python {1-3|4|1-9|1-11}
 f2: sf.Frame[
@@ -778,7 +772,7 @@ process(f2) # mypy passes
 
 # Type-Checking DataFrames
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 
 ```python {1-3|4|1-9|11-15}
 f3: sf.Frame[
@@ -794,7 +788,8 @@ f3: sf.Frame[
 process(f3) # mypy fails: error:
     # Argument 1 to "process" has incompatible type
     # "Frame[IndexDate, Index[str_], signedinteger[_64Bit], float64, str_]";
-    # expected "Frame[IndexDate, Index[str_], signedinteger[_64Bit], *tuple[float64, ...]]"
+    # expected "Frame[IndexDate, Index[str_],
+    # signedinteger[_64Bit], *tuple[float64, ...]]"
 
 ```
 </Transform>
@@ -805,7 +800,7 @@ process(f3) # mypy fails: error:
 
 # Elastic Generics
 
-<Transform :scale="1.25">
+<Transform :scale="1.35">
 <v-clicks>
 
 Static typing can be elastic

@@ -10,7 +10,7 @@ ul {
     width: 91%;
 }
 pre {
-    width: 82%;
+    width: 77%;
 }
 
 :not(pre) > code::before, :not(pre) > code::after {
