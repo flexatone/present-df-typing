@@ -20,10 +20,11 @@ background: /IMG_4390.jpg
 
 
 <br />
-<br />
 
 #### Christopher Ariza
 #### CTO, Research Affiliates
+
+<br />
 
 </div>
 
@@ -34,14 +35,9 @@ h1 {font-size: 3.5em !important; line-height: 1.3 !important;}
 <!-- NOTE: this is tested on slidev 0.50, 0.51 did not work!
 -->
 
-
----
+<!--
 
 # Elastic Generics
-
-<!--
-Python now has the tools to type DataFrames, not just column by column, but with expressive definitions that permit variable or elastic regions of columnar types
--->
 
 <Transform :scale="1.25">
 <v-clicks>
@@ -63,7 +59,7 @@ def process(
 ```
 
 </v-clicks>
-</Transform>
+</Transform> -->
 
 
 ---
@@ -83,6 +79,8 @@ Improves code quality and maintainability
 Statically verifiable with tools like `mypy` and `pyright`
 
 Numerous tools for run-time validation
+
+Still a work in progress
 
 </v-clicks>
 </Transform>
@@ -137,29 +135,6 @@ def process(
 
 
 ---
-layout: quote
----
-
-## All built-in generic containers (except one!) define unsized, homogeneous types
-
-<!-- While a list can hold any type, have to define it as having a single type (which might be a union type)
-(all but one)
--->
-
-
----
-layout: cover
-background: /IMG_4138.jpg
-
----
-
-<div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
-
-# Defining Generic Types
-
-</div>
-
----
 
 # Defining Generic Types in Python (< 3.12)
 
@@ -193,6 +168,11 @@ class Map(Generic[TK, TV]):
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
+No longer need to subclass `Generic`
+
+`TypeVar` implicitly defined
+
+
 ```python {1|all}
 class Map[TK, TV]:
     def keys() -> Iterator[TK]: ...
@@ -200,10 +180,6 @@ class Map[TK, TV]:
     def items() -> Iterator[tuple[TK, TV]]: ...
     def __getitem__(self, key: TK) -> TV: ...
 ```
-
-No longer need to subclass `Generic`
-
-`TypeVar` implicitly defined
 
 </v-clicks>
 </Transform>
@@ -233,12 +209,12 @@ Could an `Sequence[str | bool]` specify an ordering of `str` and `bool`?
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-* Generic `tuple` can do more
 * A sequence with size and type ordering
     * `tuple[str, float, float, bool]`
 * An unsized sequence of homogenous types
     * `tuple[str, ...]`
 * What if we want both?
+* What if we want this for our own generic classes?
 
 </v-clicks>
 </Transform>
@@ -280,6 +256,7 @@ Backwards compatibility through `typing-extensions`
 </v-clicks>
 </Transform>
 
+
 ---
 
 # Defining Generics with `TypeVarTuple`
@@ -287,13 +264,11 @@ Backwards compatibility through `typing-extensions`
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-A type of `TypeVar`
-
-A type parameter placeholder for zero or more concrete types
+A placeholder for zero or more concrete types
 
 Supports `tuple`-like flexibility
 
-Can mix with `TypeVar`
+Can proceed or follow one or more `TypeVar`
 
 </v-clicks>
 </Transform>
@@ -310,12 +285,17 @@ Can mix with `TypeVar`
 * Leverages the unsized sequence notation of `tuple`
 * Python < 3.11: `Unpack[tuple[int, ...]]`
 * Python >= 3.11: `*tuple[int, ...]`
-* Star-expansion "flattens" the types:
-    * `('a', 5, 3, 8, 11): tuple[str, *tuple[int, ...]]`
-    * `('a', (5, 3)): tuple[str, tuple[int, ...]]`
 
 </v-clicks>
 </Transform>
+
+
+<!-- * Star-expansion "flattens" the types:
+    * `('a', 5, 3, 8, 11): tuple[str, *tuple[int, ...]]`
+    * `('a', (5, 3)): tuple[str, tuple[int, ...]]`
+
+    -->
+
 
 
 ---
@@ -398,7 +378,7 @@ background: /IMG_4442.jpg
 ---
 <div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
 
-# 1. Typing opportunities with `tuple`
+# 1. Typing Opportunities with `tuple`
 
 </div>
 <!--
@@ -501,36 +481,6 @@ process((3, 'x', 4.2, 5.8, 7.2, None)) # mypy fails: error:
 </Transform>
 
 
-
-<!-- ---
-
-# Concretizing `tuple`: Sized & Ordered & Unsized & Sized & Ordered
-
-<Transform :scale="1.25">
-<v-clicks depth="1">
-
-Ordered segments can proceed and/or follow an `Unpack` region
-
-```python {1|1-3|1-4|all}
-def process(arg: tuple[int, *tuple[float, ...], str, bool]): ...
-
-process((3, 4.2, 5.8, 'x', False)) # mypy passes
-process((3, 'y', True)) # mypy passes
-
-process((3, 'x', 4.2, 5.8, 'y', 7.2, 'x', False)) # mypy fails: error:
-    # Argument 1 to "process" has incompatible type
-    # "tuple[int, str, float, float, str, float, str, bool]";
-    # expected "tuple[int, *tuple[float, ...], str, bool]"
-```
-
-</v-clicks>
-</Transform> -->
-
-
-
-
-
-
 ---
 layout: cover
 background: /IMG_4138.jpg
@@ -556,11 +506,11 @@ Now that we have seen the flexibility of the generic tuple, we can see how TypeV
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-Only one type variable can be a `TypeVarTuple`
+New generics can leverage the flexibility of `tuple`
 
 A placeholder for ordered types and/or an `Unpack` expression
 
-Normal `TypeVar` can proceed and/or follow a `TypeVarTuple`
+Normal `TypeVar` can proceed and/or follow a single `TypeVarTuple`
 
 </v-clicks>
 </Transform>
@@ -742,9 +692,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
     * The index label types
     * The columns label types
     * The variadic types of columnar data
-* Idiomatic DataFrame usage is diverse
-    * Fixed column size and type
-    * Flexible size with optional columns
+* Expectations of columnar types are diverse
 
 </v-clicks>
 </Transform>
@@ -759,7 +707,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 
 StaticFrame 2: a complete generic DataFrame
 
-Leverages `TypeVarTuple`
+Leverages `TypeVarTuple` for columnar types
 
 Statically verifiable with `mypy` and `pyright`
 
