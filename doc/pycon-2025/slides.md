@@ -8,10 +8,13 @@ aspectRatio: 16/9
 favicon: /favicon.ico
 title: "Elastic Generics: Flexible Static Typing with TypeVarTuple and Unpack"
 background: /IMG_4390.jpg
+# background: /IMG_3478.jpg
+# background: /IMG_4442.jpg
+# background: /IMG_4138.jpg
 
 ---
 
-<div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
+<div class="bg-black bg-opacity-70 p-4 rounded-xl text-white">
 
 # Elastic Generics: Flexible Static Typing with `TypeVarTuple` & `Unpack`
 
@@ -29,10 +32,6 @@ h1 {font-size: 3.5em !important; line-height: 1.3 !important;}
 </style>
 
 <!-- NOTE: this is tested on slidev 0.50, 0.51 did not work!
-
-Point out how strange TaggedRecord is
-Pydantic / Panderra: show how these are insufficient
-
 -->
 
 
@@ -139,7 +138,7 @@ def process(
 <Transform :scale="1.25">
 <v-clicks depth="1">
 
-* Generics made concrete with positional type parameters
+* Generics are made concrete with type parameters
 * Python containers are generic
     * `list[str]`
     * `set[int]`
@@ -155,7 +154,7 @@ def process(
 layout: quote
 ---
 
-## All built-in generic containers (except one!) define unsized, homogeneous type
+## All built-in generic containers (except one!) define unsized, homogeneous types
 
 <!-- While a list can hold any type, have to define it as having a single type (which might be a union type)
 (all but one)
@@ -306,11 +305,11 @@ Backwards compatibility through `typing-extensions`
 
 A type of `TypeVar`
 
-A zero or more "placeholder" in the type parameters
+A type parameter placeholder for zero or more concrete types
 
 Supports `tuple`-like flexibility
 
-Can mix with one or more `TypeVar`
+Can mix with `TypeVar`
 
 </v-clicks>
 </Transform>
@@ -366,6 +365,24 @@ I was just the person who had been looking for this feature for years
 
 ---
 
+# PEP & Implementation
+
+<Transform :scale="1.25">
+
+PEP 646: Mark Mendoza, Matthew Rahtz, Kumar Srinivasan, Vincent Siles
+
+CPython implementation
+
+Support in Pyright and Mypy
+
+`typing-extensions`
+
+</Transform>
+
+
+
+---
+
 # About Me
 
 <Transform :scale="1.25">
@@ -392,7 +409,7 @@ Long pondered static typing of arrays and DataFrames
 
 ---
 layout: cover
-background: /IMG_4390.jpg
+background: /IMG_4442.jpg
 
 ---
 <div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
@@ -532,7 +549,7 @@ process((3, 'x', 4.2, 5.8, 'y', 7.2, 'x', False)) # mypy fails: error:
 
 ---
 layout: cover
-background: /IMG_4390.jpg
+background: /IMG_3478.jpg
 
 ---
 <div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
@@ -732,7 +749,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 
 ---
 
-# A DataFrame is Generic
+# DataFrames are Generic
 
 <Transform :scale="1.25">
 <v-clicks depth="2">
@@ -756,7 +773,7 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
 <Transform :scale="1.25">
 <v-clicks depth="2">
 
-StaticFrame 2.0: a complete generic DataFrame
+StaticFrame 2: a complete generic DataFrame
 
 Leverages `TypeVarTuple`
 
@@ -774,7 +791,7 @@ Integrated with generic `Series`, `Index`, and `IndexHierarchy`
 
 # StaticFrame's Generic DataFrame
 
-<Transform :scale="1.5">
+<Transform :scale="1.25">
 
 ```python
 class Frame[TIndex, TColumns, *TDtypes]: ...
@@ -805,7 +822,7 @@ def process(
 
 ---
 
-# 1. Type-Checking DataFrames
+# Type-Checking DataFrames
 
 <Transform :scale="1.25">
 
@@ -827,7 +844,7 @@ process(f2) # mypy passes
 
 ---
 
-# 2. Type-Checking DataFrames
+# Type-Checking DataFrames
 
 <Transform :scale="1.25">
 
