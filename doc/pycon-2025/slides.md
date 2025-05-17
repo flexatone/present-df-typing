@@ -32,36 +32,6 @@ background: /IMG_4390.jpg
 h1 {font-size: 3.5em !important; line-height: 1.3 !important;}
 </style>
 
-<!-- NOTE: this is tested on slidev 0.50, 0.51 did not work!
--->
-
-<!--
-
-# Elastic Generics
-
-<Transform :scale="1.35">
-<v-clicks>
-
-Sometimes a type needs to be stretchable
-
-
-```python {all|8}
-import static_frame as sf
-import numpy as np
-
-def process(
-    arg: sf.Frame[
-        sf.IndexDate,                      # type of Frame index labels
-        sf.Index[np.str_],                 # type of Frame column labels
-        np.int64, *tuple[np.float64, ...], # fixed and elastic columnar types
-        ],
-    ): ...
-```
-
-</v-clicks>
-</Transform> -->
-
-
 ---
 
 # A Decade of Python Type Annotations
@@ -137,13 +107,12 @@ def process(
 # Defining Generic Types in Python (< 3.12)
 
 <Transform :scale="1.35">
-<v-clicks depth="1">
 
 Subclass `Generic`
 
 Provide `TypeVar` instances to `Generic`
 
-```python {1-2|1-4|all}
+```python {0|1-2|1-4|all}
 TK = TypeVar('TK')
 TV = TypeVar('TV')
 
@@ -155,7 +124,6 @@ class Map(Generic[TK, TV]):
 
 ```
 
-</v-clicks>
 </Transform>
 
 
@@ -164,14 +132,13 @@ class Map(Generic[TK, TV]):
 # Defining Generic Types in Python (>= 3.12)
 
 <Transform :scale="1.35">
-<v-clicks depth="1">
 
 No longer need to subclass `Generic`
 
 `TypeVar` implicitly defined
 
 
-```python {1|all}
+```python {0|1|all}
 class Map[TK, TV]:
     def keys() -> Iterator[TK]: ...
     def values() -> Iterator[TV]: ...
@@ -179,7 +146,6 @@ class Map[TK, TV]:
     def __getitem__(self, key: TK) -> TV: ...
 ```
 
-</v-clicks>
 </Transform>
 
 
@@ -218,34 +184,12 @@ Could an `Sequence[str | bool]` specify an ordering of `str` and `bool`?
 </Transform>
 
 
-<!-- ---
-
-# Extending `tuple` Flexibility
-
-<Transform :scale="1.35">
-<v-clicks depth="1">
-
-Can ordered and unsized sequences of types be combined?
-
-
-Fixed `int`, `str` followed by zero or more `float`
-
-
-`tuple[int, str, ZeroOrMore[float]]`
-
-
-</v-clicks>
-</Transform> -->
-
-
 ---
 
 # `TypeVarTuple` and `Unpack`
 
 <Transform :scale="1.35">
 <v-clicks depth="1">
-
-Defining and concretizing generics with both ordered and unsized sequences
 
 Introduced in Python 3.11 (PEP 646)
 
@@ -257,10 +201,12 @@ Backwards compatibility through `typing-extensions`
 
 ---
 
-# Defining Generics with `TypeVarTuple`
+# `TypeVarTuple`
 
 <Transform :scale="1.35">
 <v-clicks depth="2">
+
+A new type of `TypeVar`
 
 A placeholder for zero or more concrete types
 
@@ -354,9 +300,7 @@ CTO at Research Affiliates
 
 Python programmer since 2000
 
-PhD in music composition, professor of music technology
-
-Python for algorithmic composition, computational musicology
+Python for algorithmic music composition, computational musicology
 
 Since 2012, builder of financial systems in Python
 
@@ -410,11 +354,10 @@ By understanding what we can do with tuple we learn what we can do with TypeVarT
 # Concretizing `tuple`: Sized & Ordered
 
 <Transform :scale="1.35">
-<v-clicks depth="1">
 
 Define size and an ordering of types
 
-```python {1|1-3|all}
+```python {0|1|1-3|all}
 def process(arg: tuple[int, str, float]): ...
 
 process((3, 'x', 4.2)) # mypy passes
@@ -423,7 +366,7 @@ process((3, 'x', 4.2, 5.2)) # mypy fails: error:
     # Argument 1 to "process" has incompatible type
     # "tuple[int, str, float, float]"; expected "tuple[int, str, float]"
 ```
-</v-clicks>
+
 </Transform>
 
 
@@ -432,11 +375,10 @@ process((3, 'x', 4.2, 5.2)) # mypy fails: error:
 # Concretizing `tuple`: Unsized
 
 <Transform :scale="1.35">
-<v-clicks depth="1">
 
 Define zero or more of one type
 
-```python {1|1-3|1-4|all}
+```python {0|1|1-3|1-4|all}
 def process(arg: tuple[float, ...]): ...
 
 process((4.2, 5.8)) # mypy passes
@@ -446,7 +388,7 @@ process((4.2, 5.8, 7.2, 'y')) # mypy fails: error:
     # Argument 1 to "process" has incompatible type
     # "tuple[float, float, float, str]"; expected "tuple[float, ...]"
 ```
-</v-clicks>
+
 </Transform>
 
 
@@ -456,13 +398,12 @@ process((4.2, 5.8, 7.2, 'y')) # mypy fails: error:
 # Concretizing `tuple`: Sized & Ordered & Unsized
 
 <Transform :scale="1.35">
-<v-clicks depth="1">
 
-Can define only one unsized `Unpack` region
+Can define one unsized `Unpack` region
 
-Ordered segments be before or after an `Unpack` region
+Ordered types can proceed and/or follow an `Unpack` region
 
-```python {1|1-3|1-4|1-5|all}
+```python {0|1|1-3|1-4|all}
 def process(arg: tuple[int, str, *tuple[float, ...]]): ...
 
 process((3, 'x')) # mypy passes
@@ -474,7 +415,6 @@ process((3, 'x', 4.2, 5.8, 7.2, None)) # mypy fails: error:
     # expected "tuple[int, str, *tuple[float, ...]]"
 ```
 
-</v-clicks>
 </Transform>
 
 
@@ -535,7 +475,7 @@ r2: Record[int, str, Unpack[tuple[float, ...]]] # unpack is a component
 
 <Transform :scale="1.35">
 
-```python {1|1-3|1-4}
+```python {0|1|1-3|1-4}
 class Record[*Ts]: ...
 
 r1: Record[int, str]
@@ -546,11 +486,11 @@ r2: Record[int, str, *tuple[float, ...]] # unpack is star expansion
 
 ---
 
-# Concretizing `Record`
+# Concretizing `Record`: Ordered
 
 <Transform :scale="1.35">
 
-```python {1|1-3|5|5-7|5-10}
+```python {0|1-3|5|5-7|5-10}
 class Record[*Ts]:
     def __init__(self, arg: tuple[*Ts]):
         self._store = arg
@@ -567,7 +507,7 @@ process(Record((3, 'x', 4.2, 5.2))) # mypy fails: error:
 
 ---
 
-# Concretizing `Record`
+# Concretizing `Record`: Unsized
 
 <Transform :scale="1.35">
 
@@ -592,7 +532,7 @@ process(Record((4.2, 5.2, 'x'))) # mypy fails: error:
 
 ---
 
-# Concretizing `Record`
+# Concretizing `Record`: Ordered & Unsized
 
 <Transform :scale="1.35">
 
@@ -620,7 +560,7 @@ process(Record((3, 4.2, 5.2, False))) # mypy fails: error:
 
 <Transform :scale="1.35">
 
-```python {1|1-4|6|6-8|6-12|6-16}
+```python {1|1-4|6|6-8|6-13}
 class TaggedRecord[T, *Ts]:
     def __init__(self, tag: T, values: tuple[*Ts]):
         self._tag = tag
@@ -663,7 +603,7 @@ background: /IMG_4390.jpg
 <Transform :scale="1.35">
 <v-clicks depth="1">
 
-Common typing with Pandas DataFrames is insufficient
+Common DataFrames typing is shallow
 
 ```python
 import pandas as pd
@@ -686,7 +626,6 @@ def process(v: pd.DataFrame, q: pd.Series) -> pd.Series: ...
     * The index label types
     * The columns label types
     * The variadic types of columnar data
-* Expectations of columnar types are diverse
 
 </v-clicks>
 </Transform>
@@ -748,11 +687,11 @@ def process(
 
 ---
 
-# Type-Checking DataFrames
+# Type-Checking a DataFrame
 
 <Transform :scale="1.35">
 
-```python {1-3|4|1-9|1-11}
+```python {0|1-4|1-9|1-11}
 f2: sf.Frame[
     sf.IndexDate,
     sf.Index[np.str_],
@@ -770,11 +709,11 @@ process(f2) # mypy passes
 
 ---
 
-# Type-Checking DataFrames
+# Type-Checking a DataFrame
 
 <Transform :scale="1.35">
 
-```python {1-3|4|1-9|11-15}
+```python {0|1-4|1-9|11-15}
 f3: sf.Frame[
     sf.IndexDate,
     sf.Index[np.str_],
@@ -821,7 +760,22 @@ background: /IMG_3478.jpg
 ---
 <div class="bg-black bg-opacity-80 p-4 rounded-xl text-white">
 
-# Thank you
+# Thank you!
+
+  <div class="mt-6 flex justify-between w-full max-w-4xl gap-x-8">
+    <img src="/article-code-quality.png" class="w-64 h-64" />
+    <p>Improving Code Quality with Array and DataFrame Type Hints</p>
+    <p>Type-Hinting DataFrames for Static Analysis and Runtime Validation</p>
+    <img src="/article-df.png" class="w-64 h-64" />
+  </div>
+
 
 </div>
+
+
+<!-- https://medium.com/data-science/type-hinting-dataframes-for-static-analysis-and-runtime-validation-3dedd2df481d
+
+https://medium.com/data-science/improving-code-quality-with-array-and-dataframe-type-hints-cac0fb75cc11
+ -->
+
 
