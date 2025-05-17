@@ -158,9 +158,7 @@ class Map[TK, TV]:
 
 Can a generic define size or ordering of types?
 
-Could a `list[str]` specify a size?
-
-Could an `Sequence[str | bool]` specify an ordering of `str` and `bool`?
+Could a `Sequence[str | bool]` specify an ordering of `str` and `bool`?
 
 </v-clicks>
 </Transform>
@@ -746,7 +744,7 @@ Static typing can be elastic
 
 `TypeVarTuple` permits flexible, variadic generic types
 
-Unlock idiomatic DataFrame typing
+Unlock practical columnar typing in DataFrames
 
 </v-clicks>
 </Transform>
